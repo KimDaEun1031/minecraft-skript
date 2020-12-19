@@ -1,0 +1,19 @@
+# Skript supports Multiverse
+
+# Skript
+# By
+# VaneHD
+
+# Discord support 
+# https://discord.gg/AbQwuTU
+
+command /gui [<text>]:
+	permission: gui.use
+	trigger:
+		if arg-1 is not set:
+			open chest with 3 rows named "&8» &aGame Menu &8«" to player
+			wait a tick
+			message "&aOpening the GUI..."
+			format slot 13 of player with grass named "&a&l&nSkyBlock" with lore "&8» &7Click to join SkyBlock! &8«" to close then run "mvtp SkyBlock"
+			format slot 9 of player with bow named "&9&l&nKitPVP" with lore "&8» &7Click to join KitPVP! &8«" to close then run "mvtp KitPVP"
+			format slot 17 of player with egg named "&d&l&nEggWars" with lore "&8» &7Click to join EggWars! &8«" to close then run "mvtp EggWars"

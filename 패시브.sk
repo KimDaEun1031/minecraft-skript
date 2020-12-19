@@ -1,0 +1,101 @@
+#!==================================!#
+#!									!#
+#!			   야생 패시브				!#
+#!			 [광질 농사 낚시]			!#
+#!									!#
+#!									!#
+#!==================================!#
+	
+on join:
+    {actionbar::%player%} is not set
+    set {actionbar::%player%} to true	
+    while player is online:
+        send action bar "[광질레벨] : %{광질레벨}% || [경험치] %{광질경험치}%/%{레벨경험치}%" to player
+        wait 2 seconds
+    delete {actionbar::%player%}
+	
+command /actionbar:
+	trigger:
+		while player is online:
+			send action bar "[광질레벨] : %{광질레벨}% || [경험치] %{광질경험치}%/%{레벨경험치}%" to player
+			wait 2 seconds
+
+
+command /reset:
+	trigger:
+		set {광질레벨} to 1
+		set {광질경험치} to 0
+		send "&e&l[&1&l패시브&e&l] &f: 초기화되었습니다."
+		send "&e&l[&1&l패시브&e&l] &f: %{광질경험치}% || %{광질레벨}%"
+		
+		
+command /경험치최대설정:
+	trigger:
+		loop 20 times:
+			set {_n} to loop-value
+			set {_add} to {_n} * 32
+			set {_exp} to {_n} * 128 + {_add}
+			set {max} to {_exp}
+			message "%{_n}% - %{max}%"
+		set {max::21} to "MAX" 
+		set {maxlv} to 21
+		exit
+
+command /광질경험치주기:
+	trigger:
+		add 170 to {광질경험치}
+		send "&e&l[&1&l패시브&e&l] &f: 170 만큼의 광질 경험치를 주었습니다."
+		send "&e&l[&1&l패시브&e&l] &f: 현재 광질경험치 : %{광질경험치}%"
+	
+every 1 seconds:
+	loop all players:
+		set {p} to loop-player	
+		set {_lv} to {maxlv} - 1
+		set {레벨경험치} to {max} - {_lv} * 160
+		if {광질경험치} = {레벨경험치}:
+			if {광질레벨} < {maxlv}:
+				add 1 to {광질레벨}
+				set {광질경험치} to 0
+				send "=====================================" to {_p}
+				send "&e&l[&1&l패시브&e&l]광질 레벨이 1 올랐습니다!!" to {_p}
+				send "=====================================" to {_p}
+				set {maxlv} to {_lv}
+				exit
+		else if {광질경험치} > {레벨경험치}:
+			if {광질레벨} < {maxlv}:
+				add 1 to {광질레벨}
+				set {남은경험치} to {광질경험치} - {레벨경험치}
+				set {광질경험치} to 0
+				set {광질경험치} to {남은경험치}
+				send "=====================================" to {_p}
+				send "&e&l[&1&l패시브&e&l]광질 레벨이 1 올랐습니다!!" to {_p}
+				send "=====================================" to {_p}
+				set {maxlv} to {_lv}
+				exit
+	
+on break of stone:
+	add 1 to {광질경험치}
+	
+on break of coal ore:
+	add 2 to {광질경험치}
+	
+on break of nether quartz ore:
+	add 2 to {광질경험치}
+	
+on break of iron ore:
+	add 3 to {광질경험치}
+	
+on break of redstone ore:
+	add 4 to {광질경험치}
+
+on break of lapis lazuli ore:
+	add 4 to {광질경험치}
+
+on break of gold ore:
+	add 5 to {광질경험치}
+
+on break of diamond ore:
+	add 7 to {광질경험치}
+
+on break of emerald ore:
+	add 10 to {광질경험치}

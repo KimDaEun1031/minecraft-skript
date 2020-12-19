@@ -1,0 +1,92 @@
+command /스텟:
+	trigger:
+		open chest with 1 rows named "스텟" to player
+		set slot 1 of player's current inventory to Red Dye named "근력" with lore "클릭하면" and "근력 스텟 증가"
+		set slot 3 of player's current inventory to Cyan Dye named "마법" with lore "클릭하면" and "마법 스텟 증가"
+		set slot 5 of player's current inventory to Light Blue Dye named "민첩" with lore "클릭하면" and "민첩 스텟 증가"
+		set slot 7 of player's current inventory to Pink Dye named "손재주" with lore "클릭하면" and "손재주 스텟 증가"
+
+
+on inventory click: 
+	if iname contains "스텟":
+		if clicked raw slot is 1:
+			cancel event
+			execute player command "/힘스텟"
+			
+on inventory click: 
+	if iname contains "스텟":
+		if clicked raw slot is 3:
+			cancel event
+			execute player command "/마법스텟"
+			
+on inventory click: 
+	if iname contains "스텟":
+		if clicked raw slot is 5:
+			cancel event
+			execute player command "/민첩스텟"
+			
+on inventory click: 
+	if iname contains "스텟":
+		if clicked raw slot is 7:
+			cancel event
+			execute player command "/손재주스텟"
+			
+			
+		
+command /힘스텟:
+	trigger:
+		if {나머지스텟} > 0:
+			add 1 to {힘스텟}
+			subtract 1 from {나머지스텟}
+			message "힘스텟이 1 증가되었습니다."
+		else:
+			message "더이상 스텟을 올릴 수 없습니다."			
+			
+command /마법스텟:
+	trigger:
+		if {나머지스텟} > 0:
+			add 1 to {마법스텟}
+			subtract 1 from {나머지스텟}
+			message "마법스텟이 1 증가되었습니다."
+		else:
+			message "더이상 스텟을 올릴 수 없습니다."
+			
+command /민첩스텟:
+	trigger:
+		if {나머지스텟} > 0:
+			add 1 to {민첩스텟}
+			subtract 1 from {나머지스텟}
+			message "민첩스텟이 1 증가되었습니다."
+		else:
+			message "더이상 스텟을 올릴 수 없습니다."
+			
+command /손재주스텟:
+	trigger:
+		if {나머지스텟} > 0:
+			add 1 to {손재주스텟}
+			subtract 1 from {나머지스텟}
+			message "손재주스텟이 1 증가되었습니다."
+		else:
+			message "더이상 스텟을 올릴 수 없습니다."
+		
+command /스텟주기:
+	trigger:
+		add 3 to {나머지스텟}
+		message "1레벨 당 나머지 스텟 3 증가"
+		
+command /스텟전체보기:
+	trigger:
+		message "현재 힘스텟은 %{힘스텟}% 입니다."
+		message "현재 마법스텟은 %{마법스텟}% 입니다."
+		message "현재 민첩스텟은 %{민첩스텟}% 입니다."
+		message "현재 손재주스텟은 %{손재주스텟}% 입니다."
+		message "현재 나머지스텟은 %{나머지스텟}% 입니다."
+		
+command /스텟초기화:
+	trigger:
+		set {나머지스텟} to 0
+		set {힘스텟} to 0
+		set {마법스텟} to 0
+		set {민첩스텟} to 0
+		set {손재주스텟} to 0
+		message "초기화되었습니다."

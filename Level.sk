@@ -1,0 +1,100 @@
+#!==========================================!#
+#!                                          !#
+#!              경험치 스크립트              !#
+#!                                          !#
+#!==========================================!#
+
+# 제작 https://zynar.tistory.com/
+# 수정, 배포 자유롭게 이용하세요.
+# 블로그에 스크립트 연구 자료 자주 올리려고 합니다. 많은 방문 바랍니다 ^^
+# 목표. 마인크래프트 레벨 경험치가 오르면 RPG 레벨 경험치도 오르게 해보자.
+# 해당 스크립트는 연구용으로 제작되었으니 예상하지 못한 오류가 있을 수 있습니다. 잘 수정해서 사용하시길 바랍니다.
+
+options:
+	s1:&f[&c!&f] &f::&f
+	s2:&f&l[!&7&lSYSTEM&f&l!] &f::&f
+
+command /초기화:
+	trigger:
+		set {rpg.%player%.exp} to 0
+		set {rpg.%player%.lv} to 1
+		set {%player%.lv} to player's level
+		set {%player%.exp} to player's level progress
+		set {%player%.xp} to xp of player
+        
+on join:
+	if {rpg.%player%.exp} is not set:
+		set {rpg.%player%.exp} to 0
+		set {rpg.%player%.lv} to 1
+		set {%player%.lv} to player's level
+		set {%player%.exp} to player's level progress
+		set {%player%.xp} to xp of player
+
+on experience change:
+	wait 1 tick
+	set {%player%.xp2} to player's xp
+	#message "이전 경험치 포인트: %{%player%.xp}%, 현재 경험치 포인트: %{%player%.xp2}%"
+	set {_xp} to ({%player%.xp2} - {%player%.xp})
+	message "{@s2} 얻은 경험치: %{_xp}%"
+	set {%player%.xp} to {%player%.xp2}
+	set {_rexp} to ({_xp} / 2)
+	add {_rexp} to {rpg.%player%.exp}
+	message "{@s2} 얻은 RPG 경험치: %{_rexp}%"
+
+command /정보:
+	trigger:
+		set {%player%.lv} to player's level
+		set {%player%.xp} to player's xp
+		message "&6----------------------------------"
+		message ""
+		message "{@s2} 플레이어의 레벨: %{%player%.lv}%"
+		message "{@s2} 플레이어의 경험치 포인트: %{%player%.xp}%"
+		message "{@s2} RPG플레이어의 레벨: %{rpg.%player%.lv}%"
+		message "{@s2} RPG 플레이어의 경험치 포인트: %{rpg.%player%.exp}%"
+		message ""
+		message "&6----------------------------------"
+
+command /RPG경험치최대설정:
+    trigger:
+        loop 30 times:
+            set {_n} to loop-value
+            set {_add} to {_n} * 2
+            set {_exp} to {_n} * 64 + {_add}
+            set {rpg.maxExp::%{_n}%} to {_exp}
+            message "[%{_n}%] - %{rpg.maxExp::%{_n}%}%"
+        message "{@s2} 경험치 세팅이 리로드 되었습니다."
+        set {rpg.maxExp::31} to "MAX"
+        set {rpg.maxExpLv} to 31
+        exit
+
+every 1 seconds:
+	loop all players:
+		set {_p} to loop-player
+		if {rpg.%loop-player%.exp} = {rpg.maxExp::%{rpg.%loop-player%.lv}%}:
+			if {rpg.%loop-player%.lv} < {rpg.maxExpLv}:
+				add 1 to {rpg.%loop-player%.lv}
+				set {rpg.%loop-player%.exp} to 0
+				message "-------------------------------------------" to {_p}
+				message "{@s2} RPG 레벨이 1 올랐습니다!" to {_p}
+				message "-------------------------------------------" to {_p}
+				exit
+
+		else if {rpg.%loop-player%.exp} > {rpg.maxExp::%{rpg.%loop-player%.lv}%}:
+			set {_exp} to {rpg.%loop-player%.exp} - {rpg.maxExp::%{rpg.%loop-player%.lv}%}
+			if {rpg.%loop-player%.lv} < {rpg.maxExpLv}:
+				add 1 to {rpg.%loop-player%.lv}
+				set {rpg.%loop-player%.exp} to 0
+				add {_exp} to {rpg.%loop-player%.exp}
+				message "-------------------------------------------" to {_p}
+				message "{@s2} RPG 레벨이 1 올랐습니다!" to {_p}
+				message "-------------------------------------------" to {_p}
+				exit      
+
+		else if {rpg.%loop-player%.exp} == {rpg.maxExpLv}:
+			set {rpg.%loop-player%.exp} to {rpg.maxExp::31}
+			if {rpg.%loop-player%.lv} is not "MAX LV":
+				message "----------------------------------------------------" to {_p}
+				message "{@s2} 축하합니다! 최종 레벨에 달성했습니다!" to {_p}
+				message "----------------------------------------------------" to {_p}
+				set {rpg.%loop-player%.lv} to "MAX LV"
+				exit

@@ -1,0 +1,78 @@
+on join:
+	if {메뉴.%player%} is not set:
+		add 1 to {메뉴.%player%}
+		give 1 of clock named "메뉴열기" to player
+	else:
+		send "&e&l[&f&l유령열차&e&l] &f: 당신은 이미 메뉴 아이템을 받으셨습니다 !"
+		
+command /메뉴받기:
+	trigger:
+		give 1 of clock named "메뉴열기" to player
+
+on rightclick:
+	if name of player's tool contains "메뉴열기":
+		execute player command "/유령열차메뉴"
+
+
+command /유령열차메뉴:
+	trigger:
+		open chest with 1 rows named "메뉴" to player
+		set slot 1 of player's current inventory to Book named "프로필" with lore "클릭하면" and "프로필 창으로 이동"
+		set slot 4 of player's current inventory to Empty Map named "단서" with lore "클릭하면" and "단서 창으로 이동"
+		set slot 7 of player's current inventory to Book and Quill named "책 받기" with lore "클릭하면" and "책을 받습니다."
+
+on inventory click: 
+	if iname contains "메뉴":
+		if clicked raw slot is 1:
+			cancel event
+			execute player command "/프로필"
+		if clicked raw slot is 4:
+			cancel event
+			execute player command "/단서"
+		if clicked raw slot is 7:
+			cancel event
+			execute player command "/책받기"
+
+command /프로필:
+	trigger:
+		open chest with 6 rows named "프로필 1장" to player
+		set slot 20 of player's current inventory to Red Dye named "경감"
+		set slot 24 of player's current inventory to Cyan Dye named "여대생"
+		set slot 49 of player's current inventory to Red Stained Glass Pane named "뒤로가기"
+		set slot 45 of player's current inventory to White Stained Glass Pane named "왼쪽으로 이동"
+		set slot 53 of player's current inventory to Pink Stained Glass Pane named "오른쪽으로 이동"
+		
+on inventory click: 
+	if iname contains "프로필 1장":
+		if clicked raw slot is 20:
+			cancel event
+			execute player command "/경감프로필"
+		if clicked raw slot is 24:
+			cancel event
+			execute player command "/여대생프로필"
+		if clicked raw slot is 49:
+			cancel event
+			execute player command "/유령열차메뉴"
+		if clicked raw slot is 45:
+			cancel event
+			execute player command "/프로필2장"
+		if clicked raw slot is 53:
+			cancel event
+			execute player command "/프로필2장"
+		
+command /단서:
+	trigger:
+		open chest with 6 rows named "단서" to player
+		set slot 49 of player's current inventory to Red Stained Glass Pane named "뒤로가기"
+		
+on inventory click: 
+	if iname contains "단서":
+		if clicked raw slot is 49:
+			cancel event
+			execute player command "/유령열차메뉴"
+
+command /책받기:
+	trigger:
+		give player 1 of writable book
+		
+		

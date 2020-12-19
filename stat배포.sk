@@ -1,0 +1,145 @@
+on join:
+	if {stat.statpoint.%uuid of player%} is not set:
+		set {stat.statpoint.%uuid of player%} to 0
+		set {stat.str.%uuid of player%} to 0
+		set {stat.dex.%uuid of player%} to 0
+		set {stat.luk.%uuid of player%} to 0
+		set {stat.hp.%uuid of player%} to 0
+		set {stat.health.%uuid of player%} to 20
+options:
+	s: &c[ &fStat &c]&f
+command /stat [<text>] [<offlineplayer>] [<text>] [<text>]:
+	aliases: 스텟,스탯
+	trigger:
+		if arg 1 is not set:
+			set {_gui} to chest inventory with 3 rows named "{@s}"
+			open {_gui} to player
+			set slot 10 of {_gui} to rose red named "&cStr" with lore "&f1 Stat Point [ 공격력 +5 ]" and "&7클릭 시 1 Stat Point를 해당 스텟에 투자합니다." and "&7Str : %{stat.str.%uuid of player%}%"
+			set slot 12 of {_gui} to light blue dye named "&bDex" with lore "&f1 Stat Point [ 공격력 +5, 이동속도 +0.5%% ]" and "&7클릭 시 1 Stat Point를 해당 스텟에 투자합니다." and "&7Dex : %{stat.dex.%uuid of player%}%"
+			set slot 14 of {_gui} to dandelion yellow named "&eLuk" with lore "&f1 Stat Point [ 크리티컬확률 +0.15%%, 크리티컬데미지 +6 ]" and "&7클릭 시 1 Stat Point를 해당 스텟에 투자합니다." and "&7Luk : %{stat.luk.%uuid of player%}%"
+			set slot 16 of {_gui} to pink dye named "&dHP" with lore "&f1 Stat Point [ 체력 +60 ]" and "&7클릭 시 1 Stat Point를 해당 스텟에 투자합니다." and "&7HP : %{stat.hp.%uuid of player%}%"
+			set slot 4 of {_gui} to skull of player named "&fStat Point" with lore "&6My Stat Point : %{stat.statpoint.%uuid of player%}%"
+			stop
+		if player is op:
+			if arg 1 is "도움말":
+				send ""
+				send "{@s} /stat - stat GUI를 오픈합니다."
+				send "{@s} /stat 도움말 - Stat 명령어를 확인합니다."
+				send "{@s} /stat 포인트지급 [플레이어] [수량]"
+				send "{@s} /stat 포인트설정 [플레이어] [수량]"
+				send "{@s} /stat 스텟초기화 [플레이어]"
+				send "{@s} /stat 확인 [플레이어]"
+				send "{@s} /stat 스텟포인트권 [수량]"
+				send "{@s} /stat 스텟초기화권"
+				send ""
+				stop
+			if arg 1 is "스텟초기화권":
+				give book named "&7[ &f스텟초기화권 &7]" with lore "&7└ 우클릭시 스텟을 초기화합니다." to player
+				stop
+			if arg 1 is "스텟포인트권":
+				give book named "&7[ &f스텟포인트 %arg-2% &7]" with lore "&7└ 우클릭시 스텟을 획득합니다." to player
+				stop
+			if arg 2 is not set:
+				send "&7플레이어를 입력해주세요."
+				stop
+			if arg 1 is "확인":
+				send "&c----------[ &f%arg-2% 님의 스텟 &c]----------"
+				send ""
+				send "&cStr : %{stat.str.%uuid of arg-2%}%"
+				send "&bDex : %{stat.dex.%uuid of arg-2%}%"
+				send "&eLuk : %{stat.luk.%uuid of arg-2%}%"
+				send "&dHP : %{stat.hp.%uuid of arg-2%}%"
+				send ""
+				send "&c----------------------------------"				
+				stop
+			if arg 1 is "스텟초기화":
+				add {stat.str.%uuid of arg-2%} to {stat.statpoint.%uuid of arg-2%}
+				add {stat.dex.%uuid of arg-2%} to {stat.statpoint.%uuid of arg-2%}
+				add {stat.luk.%uuid of arg-2%} to {stat.statpoint.%uuid of arg-2%}
+				add {stat.hp.%uuid of arg-2%} to {stat.statpoint.%uuid of arg-2%}
+				set {stat.str.%uuid of arg-2%} to 0
+				set {stat.dex.%uuid of arg-2%} to 0
+				set {stat.luk.%uuid of arg-2%} to 0
+				set {stat.hp.%uuid of arg-2%} to 0
+				set {stat.health.%uuid of arg-2%} to 20
+				set arg-2's walk speed to 0.2 + (0.2*(({stat.dex.%uuid of arg-2%} * 0.5)/100))
+				send "&7스텟을 초기화하였습니다. 현재 스텟포인트 : %{stat.statpoint.%uuid of arg-2%}%"
+				stop	
+			if arg 3 is not set:
+				send "&7수량을 입력해주세요."
+				stop
+			set {_point} to arg-3 parsed as number
+			if arg 1 is "포인트지급":
+				add {_point} to {stat.statpoint.%uuid of arg-2%}
+				send "&7스텟포인트를 획득하였습니다. 현재 스텟포인트 : %{stat.statpoint.%uuid of arg-2%}%" to arg-2
+			if arg 1 is "포인트설정":
+				set {stat.statpoint.%uuid of arg-2%} to {_point}
+				send "&7스텟포인트가 설정되었습니다. 현재 스텟포인트 : %{stat.statpoint.%uuid of arg-2%}%" to arg-2
+on right click:
+	if name of player's tool contains "스텟포인트":
+		set {_name} to uncolored name of player's tool
+		replace all "[ 스텟포인트 " and " ]" with "" in {_name}
+		set {_name} to {_name} parsed as integer
+		add {_name} to {stat.statpoint.%uuid of player%}
+		send "&7스텟포인트를 획득하였습니다. 현재 스텟포인트 : %{stat.statpoint.%uuid of player%}%"
+		remove 1 of player's tool from player's inventory
+	if name of player's tool contains "스텟초기화권":
+		remove 1 of player's tool from player's inventory
+		add {stat.str.%uuid of player%} to {stat.statpoint.%uuid of player%}
+		add {stat.dex.%uuid of player%} to {stat.statpoint.%uuid of player%}
+		add {stat.luk.%uuid of player%} to {stat.statpoint.%uuid of player%}
+		add {stat.hp.%uuid of player%} to {stat.statpoint.%uuid of player%}
+		set {stat.str.%uuid of player%} to 0
+		set {stat.dex.%uuid of player%} to 0
+		set {stat.luk.%uuid of player%} to 0
+		set {stat.hp.%uuid of player%} to 0
+		set player's walk speed to 0.2 + (0.2*(({stat.dex.%uuid of player%} * 0.5)/100))
+		set {stat.health.%uuid of player%} to 20
+		send "&7스텟을 초기화하였습니다. 현재 스텟포인트 : %{stat.statpoint.%uuid of player%}%"
+on inventory click:
+	if name of current inventory is "{@s}":
+		cancel event
+	set {_stat::str} to "&cStr"
+	set {_stat::dex} to "&bDex"
+	set {_stat::luk} to "&eLuk"
+	set {_stat::hp} to "&dHP"
+	loop {_stat::*}:
+		if name of clicked slot contains "%loop-value%":
+			if {stat.statpoint.%uuid of player%} <= 0:
+				send "&7스텟 포인트가 부족합니다."
+				play sound "entity.villager.no" for the player
+				close player's inventory
+			else:
+				add 1 to {stat.%loop-index%.%uuid of player%}
+				remove 1 from {stat.statpoint.%uuid of player%}
+				send "&7스텟포인트를 투자하였습니다. 현재 스텟포인트 : %{stat.statpoint.%uuid of player%}%"
+				set {_gui} to chest inventory with 3 rows named "{@s}"
+				open {_gui} to player
+				set slot 10 of {_gui} to rose red named "&cStr" with lore "&f1 Stat Point [ 공격력 +5 ]" and "&7클릭 시 1 Stat Point를 해당 스텟에 투자합니다." and "&7Str : %{stat.str.%uuid of player%}%"
+				set slot 12 of {_gui} to light blue dye named "&bDex" with lore "&f1 Stat Point [ 공격력 +5, 이동속도 +0.5%% ]" and "&7클릭 시 1 Stat Point를 해당 스텟에 투자합니다." and "&7Dex : %{stat.dex.%uuid of player%}%"
+				set slot 14 of {_gui} to dandelion yellow named "&eLuk" with lore "&f1 Stat Point [ 크리티컬확률 +0.15%%, 크리티컬데미지 +6 ]" and "&7클릭 시 1 Stat Point를 해당 스텟에 투자합니다." and "&7Luk : %{stat.luk.%uuid of player%}%"
+				set slot 16 of {_gui} to pink dye named "&dHP" with lore "&f1 Stat Point [ 체력 +60 ]" and "&7클릭 시 1 Stat Point를 해당 스텟에 투자합니다." and "&7HP : %{stat.hp.%uuid of player%}%"
+				set slot 4 of {_gui} to skull of player named "&fStat Point" with lore "&6My Stat Point : %{stat.statpoint.%uuid of player%}%"			
+				if loop-index is "hp":
+					set {stat.healthper.%uuid of player%} to ({stat.hp.%uuid of player%} * 60) / 20
+					set player's health to ({stat.health.%uuid of player%} / {stat.healthper.%uuid of player%}) / 2
+				if loop-index is "dex":	
+					set player's walk speed to 0.2 + (0.2*(({stat.dex.%uuid of player%} * 0.5)/100))	
+				stop
+on damage:
+	if {stat.luk.%uuid of attacker%} > 0:
+		set {_r} to random number between 0 and 100
+		if {_r} < ({stat.luk.%uuid of attacker%} * 0.15):
+			add {stat.luk.%uuid of attacker%} * 6 to damage
+	add {stat.str.%uuid of attacker%} * 5 to damage
+	add {stat.dex.%uuid of attacker%} * 4 to damage
+	if {stat.hp.%uuid of victim%} > 0:
+		remove damage from {stat.health.%uuid of victim%}
+		set {stat.healthper.%uuid of victim%} to ({stat.hp.%uuid of victim%} * 60) / 20
+		set damage to 0
+		set victim's health to ({stat.health.%uuid of victim%} / {stat.healthper.%uuid of victim%}) / 2
+on death:		
+	if {stat.hp.%uuid of player%} is not set:
+		set {stat.health.%uuid of player%} to 20
+	else:
+		set {stat.health.%uuid of player%} to ({stat.hp.%uuid of player%} * 60)

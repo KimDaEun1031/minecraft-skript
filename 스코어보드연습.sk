@@ -1,0 +1,16 @@
+#command /helloscoreboards:
+#    trigger:
+#        set name of sidebar of player to "&6Hello Scoreboards!"
+#        set score "My Score:" in sidebar of player to 0
+#        wait 10 seconds
+#        wipe player's sidebar
+#
+
+every 1 seconds:
+	loop all players:
+		if {스코어보드.%loop-player%} is true:
+			wipe loop-player's sidebar
+			set name of sidebar of loop-player to "&6Hello Scoreboards!"
+			set score "My Score:" in sidebar of loop-player to 0
+			
+	

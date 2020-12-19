@@ -1,0 +1,54 @@
+command /돈받기 [<integer>]:
+	trigger:
+		if player is not op:
+			send "&e&l[&2&l수표&e&l] &f: 관리자 권한이 필요합니다."
+			exit
+		else:
+			add arg 1 to {돈.%uuid of player%}
+			send "&e&l[&2&l수표&e&l] &f: 당신의 현재 잔액은 &6%{돈.%uuid of player%}%"
+			exit
+			
+command /돈:
+	trigger:
+		set {돈.%uuid of player%} to 0
+		send "&e&l[&2&l수표&e&l] &f: 당신의 현재 잔액은 &6%{돈.%uuid of player%}%"
+
+command /수표발행 [<integer>] [<integer>]:
+	trigger:
+		if {돈.%uuid of player%} is set:
+			if arg 1 is not set:
+				send "&e&l[&2&l수표&e&l] &f: /수표발행 [&b가격&f] [&d갯수&f]"
+			else:
+				if arg 2 is not set:
+					if {돈.%uuid of player%} >= arg 1:
+						subtract arg 1 from {돈.%uuid of player%}
+						give player 1 paper named "&6%arg 1%&f원 수표" with lore " " and "&f발행자 : &a%player%"
+						send "&e&l[&2&l수표&e&l] &f: &6%arg 1%&f원 수표를 1장 발행하셨습니다."
+				else:
+					if {돈.%uuid of player%} >= arg 1 * arg 2:
+						subtract arg 1 * arg 2 from {돈.%uuid of player%}
+						give player arg 2 of paper named "&6%arg 1%&f원 수표" with lore " " and "&f발행자 : &a%player%"
+						send "&e&l[&2&l수표&e&l] &f: &6%arg 1%&f원 수표를 &3%arg 2%&f장 발행하셨습니다."
+						
+on right click with paper:
+	if name of player's tool contains "수표":
+		if lore of player's tool contains " ":
+			set {_name} to player's tool
+			set {_money} to uncolored name of player's tool
+			set {_man::*} to uncolored lore of player's tool
+			wait 1 tick
+			replace all " " and "원" and "수표" with "" in {_money}
+			wait 1 tick
+			replace all " " and "발행자" and ":" with "" in {_man::2}
+			add {_money} parsed as integer to {돈.%uuid of player%}
+			remove 1 of {_name} from player's inventory
+			wait 1 tick
+			send "&e&l[&2&l수표&e&l] &f: %{_money}%원 수표를 사용하셨습니다. - 발행자 : %{_man::2}%"
+			
+			
+			
+			
+			
+			
+			
+			

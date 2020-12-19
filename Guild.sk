@@ -1,0 +1,546 @@
+# 해당 Skript 는 수이(dla1936) 의 저작물 이며 저작권 은 수이(dla1936) 에게 있습니다.
+
+# Copyright 2017-2019. 수이(dla1936) all rights reserved.
+
+# Skript 재배포 X
+
+# Blog : http://blog.naver.com/dla1936
+# 해당 Skript는 위의 블로그에서만 배포될 수 있습니다.
+
+function setItemLore(item:item,lore:text) :: item: # 아이템 로어 설정
+	set {_lore::*} to {_lore} split at "||"
+	loop {_lore::*}:
+		add 1 to {_line}
+		set line {_line} of lore of {_item} to loop-value
+	return {_item}
+# ===========================================================================
+on load:
+	set {guild.max.1} to 15
+	set {guild.max.2} to 20
+	set {guild.max.3} to 25
+	set {guild.max.4} to 30
+	set {guild.max.5} to 35
+
+	set {guild.price.1} to 1000
+	set {guild.price.2} to 2000
+	set {guild.price.3} to 3000
+	set {guild.price.4} to 4000
+options:
+	inven.list: Guild List
+	inven.manage: Guild Manage
+	inven.member: Guild Member
+	inven.request: Guild Request
+	inven.shop: Guild Shop
+	inven.skill: Guild Skill
+
+function getPlayerGuild(p:player) :: text: # 길드 이름 가져오기
+	set {_pu} to uuid of {_p}
+	set {_r} to {guild.has::%{_pu}%}
+	return {_r}
+function getGuildPoint(p:player) :: number: # 길드 포인트 가져오기
+	set {_guild} to getPlayerGuild({_p})
+	set {_r} to 0
+	set {_r} to {guild.data::%{_guild}%::point}
+	return {_r}
+function getGuildLevel(p:player) :: number: # 길드 레벨 가져오기
+	set {_guild} to getPlayerGuild({_p})
+	return {guild.data::%{_guild}%::level}
+function getGuildLeader(p:player) :: text: # 길드 리더 가져오기
+	set {_guild} to getPlayerGuild({_p})
+	return {guild.data::%{_guild}%::leader}
+function isGuildLeader(p:player) :: boolean:
+	set {_guild} to getPlayerGuild({_p})
+	set {_pu} to uuid of {_p}
+	if {_pu} is {guild.data::%{_guild}%::leader}:
+		return true
+	else:
+		return false
+function isGuildExist(guild:text) :: boolean: # 길드 존재 여부
+	set {_r} to false
+	loop {guild.list::*}:
+		loop-value is {_guild}
+		set {_r} to true
+		exit loop
+	return {_r}
+function addGuildPoint(p:player,point:number): # 길드 포인트 추가
+	set {_pu} to uuid of {_p}
+	set {_guild} to getPlayerGuild({_p})
+
+	{_guild} is set
+
+	add {_point} to {guild.data::%{_guild}%::point::%{_pu}%}
+	add {_point} to {guild.data::%{_guild}%::point}
+function subGuildPoint(p:player,point:number): # 길드 포인트 차감
+	set {_guild} to getPlayerGuild({_p})
+
+	{_guild} is set
+
+	subtract {_point} from {guild.data::%{_guild}%::point}
+	{guild.data::%{_guild}%::point} < 0
+	set {guild.data::%{_guild}%::point} to 0
+function setGuildPoint(p:player,point:number): # 길드 포인트 설정
+	set {_guild} to getPlayerGuild({_p})
+
+	{_guild} is set
+
+	set {guild.data::%{_guild}%::point} to {_point}
+
+function getGuildList(type: text="") :: texts: # 정렬 된 길드 변수 가져오기
+	loop {guild.list::*}:
+		set {_leader} to {guild.data::%loop-value%::leader}
+		set {_lv} to {guild.data::%loop-value%::level}
+		set {_list::%{_leader}%} to {_lv}
+
+	loop {_list::*}:
+		add loop-value to {_value.%loop-value%::*}
+		add loop-index to {_name.%loop-value%::*}
+		set {_rank::%loop-value%} to loop-value
+	set {_low::*} to {_rank::*}
+
+	if {_type} is "up":
+		loop number of {_low::*} times:
+			set {_n} to number of {_low::*} - loop-number + 1
+			add {_low::%{_n}%} to {_high::*}
+
+		loop {_high::*}:
+			loop number of {_name.%loop-value%::*} times:
+				set {_value} to {_name.%loop-value-1%::%loop-number%}
+				set {_guild} to {guild.has::%{_value}%}
+				add {_guild} to {_r::*}
+	else if {_type} is "down":
+		loop {_low::*}:
+			loop number of {_name.%loop-value%::*} times:
+				set {_value} to {_name.%loop-value-1%::%loop-number%}
+				set {_guild} to {guild.has::%{_value}%}
+				add {_guild} to {_r::*}
+	else:
+		set {_r::*} to {guild.list::*}
+
+	return {_r::*}
+
+function runGuildList(p:player,page:number): # 길드 목록 불러오기
+	{_page} > 0
+
+	if name of {_p}' current inventory is not "{@inven.list}":
+		open "CHEST" with 6 row named "{@inven.list}" to {_p}
+
+	if name of slot 49 of {_p}' current inventory contain "(레벨 높은 순)":
+		set {_list::*} to getGuildList("up")
+	else if name of slot 49 of {_p}' current inventory contain "(레벨 낮은 순)":
+		set {_list::*} to getGuildList("down")
+	else:
+		set {_list::*} to getGuildList()
+
+	set {_num} to ({_page} - 1) * 45
+	loop 45 times:
+		set slot loop-number - 1 of {_p}' current inventory to air
+		add 1 to {_num}
+		{_list::%{_num}%} is set
+
+		set {_guild} to {_list::%{_num}%}
+		set {_leader} to {guild.data::%{_guild}%::leader} parsed as offline player
+		set {_lv} to {guild.data::%{_guild}%::level}
+
+		set {_item} to {_leader}' skull named "&e&l%{_guild}%"
+		set {_item} to setItemLore({_item}, "   &7길드 리더 : &e%{_leader}%||   &7길드 레벨 : &eLv.%{_lv}%||   &7길드 인원 : &e%number of {guild.data::%{_guild}%::list::*}% &7/ %{guild.max.%{_lv}%}%||||   &aSHIFT 우클릭 시 &e%{_guild}% &a길드에 가입 신청을 합니다.")
+
+		set slot loop-number - 1 of {_p}' current inventory to {_item}
+
+	# set {_prev} to "MHF_ArrowLeft" parsed as offline player
+	# set {_next} to "MHF_ArrowRight" parsed as offline player
+	# set {_i.prev} to {_prev}' skull named "&c이전"
+	# set {_i.next} to {_next}' skull named "&a다음"
+	set {_i.prev} to paper named "&c이전"
+	set {_i.next} to paper named "&a다음"
+	set {_i.prev}' lore to "&7현재 페이지 %{_page}%"
+	set {_i.next}' lore to "&7현재 페이지 %{_page}%"
+
+	set slot 48 of {_p}' current inventory to {_i.prev}
+	set slot 50 of {_p}' current inventory to {_i.next}
+
+	slot 49 of {_p}' current inventory is air
+	set {_item} to book named "&r정렬 하기"
+	set {_item} to setItemLore({_item}, "   &7좌클릭 : 레벨 높은 순||   &7우클릭 : 레벨 낮은 순")
+
+	set slot 49 of {_p}' current inventory to {_item}
+
+	set slot 45 of {_p}' current inventory to book_and_quill named "&a&l[길드 생성하기]"
+
+function sendGuildRequest(p:player,guild:text): # 길드 신청 보내기
+	set {_pu} to uuid of {_p}
+
+	if isGuildExist({_guild}) is false:
+		send "&c존재하지 않는 길드 입니다." to {_p}
+		exit
+
+	if number of {guild.data::%{_guild}%::request::*} > 54:
+		send "&c%{_guild}% 길드에 가입 신청을 한 유저가 너무 많습니다." to {_p}
+		exit
+
+	if getPlayerGuild({_p}) is set:
+		send "&c길드 가입 신청을 할 수 없는 상태입니다." to {_p}
+		exit
+
+	loop {guild.data::%{_guild}%::request::*}:
+		loop-value is {_pu}
+		send "&c이미 가입 신청한 길드에는 다시 신청할 수 없습니다." to {_p}
+		exit
+
+	add {_pu} to {guild.data::%{_guild}%::request::*}
+	send "&a[ &e%{_guild}% &a] 길드에 가입 신청을 보냈습니다." to {_p}
+
+function runGuildCreate(p:player,name:text): # 길드 생성
+	set {_name} to uncolored {_name}
+	set {_pu} to uuid of {_p}
+
+	if getPlayerGuild({_p}) is set:
+		send "&c길드를 만들 수 없는 상태 입니다." to {_p}
+		exit
+
+	if {_name} is not set:
+		send "&c길드 이름을 입력해 주세요." to {_p}
+		exit
+	if length of {_name} > 7:
+		send "&c길드 이름은 5자를 초과할 수 없습니다." to {_p}
+		exit
+
+	if isGuildExist({_name}) is true:
+		send "&c이미 존재하는 길드 이름 입니다." to {_p}
+		exit
+
+	add {_name} to {guild.list::*}
+	set {guild.has::%{_pu}%} to {_name}
+	add {_pu} to {guild.data::%{_name}%::list::*}
+	set {guild.data::%{_name}%::leader} to {_pu}
+	set {guild.data::%{_name}%::level} to 1
+
+	send "&a[ &e%{_name}% &a] 길드를 생성했습니다." to {_p}
+
+function runGuildLeave(p:player): # 길드 탈퇴
+	set {_pu} to uuid of {_p}
+	set {_guild} to getPlayerGuild({_p})
+
+	if {_p} is not set:
+		send "&c소속된 길드가 없습니다." to {_p}
+		exit
+
+	if isGuildLeader({_p}) is true:
+		if number of {guild.data::%{_guild}%::list::*} > 1:
+			send "&c리더는 다른 구성원이 있을 때 탈퇴할 수 없습니다." to {_p}
+			exit
+
+		delete {guild.data::%{_guild}%::*}
+		remove {_guild} from {guild.list::*}
+		set {guild.list::*} to {guild.list::*}
+
+		runRemovePlayerGuild({_p})
+
+		send "&a[ &e%{_guild}% &a] 길드를 삭제했습니다." to {_p}
+	else:
+		loop {guild.data::%{_guild}%::list::*}:
+			send "&c[ &e%{_p}% &c] 님이 길드에서 탈퇴했습니다." to loop-value parsed as offline player
+
+		runRemovePlayerGuild({_p})
+
+function runGuildManage(p:player): # 길드 관리
+	if getPlayerGuild({_p}) is not set:
+		send "&c소속된 길드가 없습니다." to {_p}
+		exit
+
+	set {_guild} to getPlayerGuild({_p})
+	set {_leader} to {guild.data::%{_guild}%::leader} parsed as offline player
+	set {_lv} to getGuildLevel({_p})
+
+	set {_item} to book named "&r길드 정보"
+	set {_item} to setItemLore({_item}, "   &7길드 이름 : &e%{_guild}%||   &7길드 리더 : &e%{_leader}%||   &7길드 레벨 : &eLv.%{_lv}%||   &7길드 인원 : &e%number of {guild.data::%{_guild}%::list::*}% &7/ %{guild.max.%{_lv}%}%||||&cSHIFT 좌클릭 시 길드를 탈퇴합니다.")
+
+	open "CHEST" with 1 row named "{@inven.manage}" to {_p}
+	set slot 1 of {_p}' current inventory to player head named "&r인원 관리"
+	set slot 3 of {_p}' current inventory to item frame named "&r길드 상점"
+	set slot 5 of {_p}' current inventory to iron sword named "&r길드 스킬"
+	set slot 7 of {_p}' current inventory to {_item}
+
+function runGuildMember(p:player): # 길드 멤버
+	wait 1 tick
+	open "CHEST" with 5 row named "{@inven.member}" to {_p}
+	set {_guild} to getPlayerGuild({_p})
+
+	loop {guild.data::%{_guild}%::list::*}:
+		add 1 to {_slot}
+
+		set {_mem} to loop-value parsed as offline player
+		set {_lv} to 1
+		set {_exp} to 0
+
+		set {_item} to {_mem}' skull named "&r%{_mem}%"
+		if loop-value is {guild.data::%{_guild}%::leader}:
+			set {_item} to setItemLore({_item}, "   &7직위 : &e길드 마스터||   &7레벨 : &eLv.%{_lv}% (%{_exp}% exp)||   &7획득 길드 포인트 : &e%{guild.data::%{_guild}%::point::%loop-value%}%")
+		else:
+			if isGuildLeader({_p}) is true:
+				set {_item} to setItemLore({_item}, "   &7직위 : &e길드원||   &7레벨 : &eLv.%{_lv}% (%{_exp}% exp)||   &7획득 길드 포인트 : &e%{guild.data::%{_guild}%::point::%loop-value%}%||||   &cSHIFT 좌클릭 시 길드원을 추방합니다.")
+			else:
+				set {_item} to setItemLore({_item}, "   &7직위 : &e길드원||   &7레벨 : &eLv.%{_lv}% (%{_exp}% exp)||   &7획득 길드 포인트 : &e%{guild.data::%{_guild}%::point::%loop-value%}%")
+
+		set slot {_slot} - 1 of {_p}' current inventory to {_item}
+
+	set slot 40 of {_p}' current inventory to paper named "&r가입 신청 관리"
+
+function runManageRequest(p:player): # 길드 가입 신청 관리
+	wait 1 tick
+	open "CHEST" with 6 row named "{@inven.request}" to {_p}
+
+	set {_guild} to getPlayerGuild({_p})
+
+	loop {guild.data::%{_guild}%::request::*}:
+		add 1 to {_slot}
+		set {_rp} to loop-value parsed as offline player
+
+		set {_item} to {_rp}' skull named "&r%{_rp}%"
+		set {_item} to setItemLore({_item}, "&a신청 수락 - SHIFT 좌클릭||&c신청 거절 - SHIFT 우클릭")
+
+		set slot {_slot} - 1 of {_p}' current inventory to {_item}
+
+function runRemovePlayerGuild(p:player): # 플레이어의 길드를 삭제
+	set {_pu} to uuid of {_p}
+	set {_guild} to {guild.has::%{_pu}%}
+	delete {guild.has::%{_pu}%}
+	{_guild} is set
+	remove {_pu} from {guild.data::%{_guild}%::list::*}
+	set {guild.data::%{_guild}%::list::*} to {guild.data::%{_guild}%::list::*}
+	delete {guild.data::%{_guild}%::point::%{_pu}%}
+
+function runGuildShop(p:player): # 길드 상점
+	wait 1 tick
+	open "CHEST" with 1 row named "{@inven.shop}" to {_p}
+
+	set {_guild} to getPlayerGuild({_p})
+	set {_lv} to getGuildLevel({_p})
+	set {_point} to getGuildPoint({_p})
+
+	if {_lv} is 5:
+		set {_item} to book named "&a길드 최대 레벨"
+		enchant {_item} with protection 1
+	else:
+		set {_item} to book named "&a길드 레벨업"
+		set {_item} to setItemLore({_item}, "&7다음 레벨업에 필요한 길드 포인트 : &e%{guild.price.%{_lv}%}% 포인트||&7현재 보유중인 길드 포인트 : &e%{_point}% 포인트")
+
+	set slot 4 of {_p}' current inventory to {_item}
+
+function runGuildSkill(p:player): # 길드 스킬
+	open "CHEST" with 1 row named "{@inven.skill}" to {_p}
+
+	set slot 4 of {_p}' current inventory to barrier named "&c구현 X"
+
+on inventory click: # 길드 목록 클릭이벤트
+	name of player' current inventory is "{@inven.list}"
+	cancel event
+
+	clicked slot is clicked raw slot
+	clicked item is not air
+
+	if clicked slot is 48:
+		set {_page} to uncolored clicked item' lore
+		replace "현재 페이지" and " " with "" in {_page}
+		set {_page} to {_page} parsed as number
+
+		runGuildList(player, {_page} - 1)
+	else if clicked slot is 50:
+		set {_page} to uncolored clicked item' lore
+		replace "현재 페이지" and " " with "" in {_page}
+		set {_page} to {_page} parsed as number
+
+		runGuildList(player, {_page} + 1)
+	else if clicked slot is 49:
+		if clicked type is left mouse button:
+			set {_item} to book named "&r정렬 하기 (레벨 높은 순)"
+		else if clicked type is right mouse button:
+			set {_item} to book named "&r정렬 하기 (레벨 낮은 순)"
+
+		{_item} is set
+		set {_item} to setItemLore({_item}, "   &7좌클릭 : 레벨 높은 순||   &7우클릭 : 레벨 낮은 순")
+
+		set slot 49 of player' current inventory to {_item}
+
+		runGuildList(player, 1)
+	else if clicked slot is 45:
+		set {guild.create::%player%} to true
+		send "&a생성할 길드 이름을 입력해 주세요. '취소' 를 입력 시 취소됩니다."
+		close player' inventory
+	else:
+		clicked type is left mouse button with shift
+		set {_guild} to uncolored clicked item' name
+
+		sendGuildRequest(player, {_guild})
+
+on inventory click: # 길드 관리 클릭이벤트
+	name of player' current inventory is "{@inven.manage}"
+	cancel event
+
+	clicked slot is clicked raw slot
+	clicked item is not air
+
+	if clicked slot is 1:
+		runGuildMember(player)
+	else if clicked slot is 3:
+		runGuildShop(player)
+	else if clicked slot is 5:
+		runGuildSkill(player)
+	else if clicked slot is 7:
+		clicked type is right mouse button with shift
+		runGuildLeave(player)
+		wait 1 tick
+		close player' inventory
+
+on inventory click: # 길드 멤버 클릭이벤트
+	name of player' current inventory is "{@inven.member}"
+	cancel event
+
+	clicked slot is clicked raw slot
+	clicked item is not air
+
+	if clicked slot is 40:
+		runManageRequest(player)
+	else:
+		if clicked type is right mouse button with shift:
+			set {_pu} to uuid of player
+			set {_guild} to {guild.has::%{_pu}%}
+
+			if {_pu} is not {guild.data::%{_guild}%::leader}:
+				send "&c길드 마스터만 사용할 수 있습니다."
+				exit
+
+			set {_tu} to {guild.data::%{_guild}%::list::%clicked slot + 1%}
+			set {_t} to {_tu} parsed as offline player
+
+			loop {guild.data::%{_guild}%::list::*}:
+				send "&c[ &e%{_t}% &c] 님이 길드에서 추방되었습니다." to loop-value parsed as offline player
+
+			runRemovePlayerGuild({_t})
+			runGuildMember(player)
+
+on inventory click: # 길드 가입신청 클릭이벤트
+	name of player' current inventory is "{@inven.request}"
+	cancel event
+
+	clicked slot is clicked raw slot
+	clicked item is not air
+
+	set {_pu} to uuid of player
+	set {_guild} to {guild.has::%{_pu}%}
+	set {_lv} to getPlayerGuild(player)
+
+	if number of {guild.data::%{_guild}%::list::*} >= {guild.max.%{_lv}%}:
+		send "&c더 이상 새로운 길드원을 받을 수 없습니다."
+		exit
+
+	set {_tu} to {guild.data::%{_guild}%::request::%clicked slot + 1%}
+	set {_t} to {_tu} parsed as offline player
+
+	if getPlayerGuild({_t}) is set:
+		send "&c다른 길드에 가입되어 있는 플레이어 입니다."
+		delete {guild.data::%{_guild}%::request::%clicked slot + 1%}
+		set {guild.data::%{_guild}%::request::*} to {guild.data::%{_guild}%::request::*}
+
+		runManageRequest(player)
+		exit
+
+	if clicked type is left mouse button with shift: # 신청 수락
+		set {guild.has::%{_tu}%} to {_guild}
+		add {_tu} to {guild.data::%{_guild}%::list::*}
+
+		loop {guild.data::%{_guild}%::list::*}:
+			send "&a[ &e%{_t}% &a] 님이 새롭게 길드에 가입되었습니다." to loop-value parsed as offline player
+
+		delete {guild.data::%{_guild}%::request::%clicked slot + 1%}
+		set {guild.data::%{_guild}%::request::*} to {guild.data::%{_guild}%::request::*}
+
+		runManageRequest(player)
+
+	else if clicked type is right mouse button with shift: # 신청 거절
+		send "&c[ &e%{_t}% &c] 님의 가입 신청을 거절했습니다."
+		send "&c[ &e%{_guild}% &c] 길드에서 가입 신청을 거절했습니다." to {_t}
+
+		delete {guild.data::%{_guild}%::request::%clicked slot + 1%}
+		set {guild.data::%{_guild}%::request::*} to {guild.data::%{_guild}%::request::*}
+
+		runManageRequest(player)
+
+on inventory click: # 길드 상점 클릭이벤트
+	name of player' current inventory is "{@inven.shop}"
+	cancel event
+
+	clicked slot is clicked raw slot
+	clicked item is not air
+
+	if isGuildLeader(player) is false:
+		send "&c길드 리더만 상점을 이용할 수 있습니다."
+		exit
+
+	if clicked slot is 4:
+		set {_guild} to getPlayerGuild(player)
+		set {_point} to getGuildPoint(player)
+		set {_lv} to getGuildLevel(player)
+
+		if {_point} < {guild.price.%{_lv}%}:
+			send "&c길드 포인트가 부족합니다."
+			exit
+
+		subGuildPoint(player, {guild.price.%{_lv}%})
+		add 1 to {guild.data::%{_guild}%::level}
+		send "&a길드 레벨을 성공적으로 구입했습니다."
+
+		runGuildShop(player)
+
+on inventory click:
+	name of player' current inventory is "{@inven.skill}"
+	cancel event
+
+	clicked slot is clicked raw slot
+	clicked item is not air
+
+on chat: # 길드 생성 채팅이벤트
+	{guild.create::%player%} is set
+	cancel event
+
+	delete {guild.create::%player%}
+
+	if message is "취소":
+		send "&c길드 생성이 취소되었습니다."
+	else:
+		runGuildCreate(player, uncolored message)
+
+on chat: # 길드 채팅
+	first 5 characters of message is "길드채팅 "
+	cancel event
+
+	set {_length} to length of message - 5
+	set {_msg} to last {_length} character of message
+	set {_guild} to getPlayerGuild(player)
+
+	if {_guild} is not set:
+		send "&c소속된 길드가 없습니다."
+		exit
+
+	loop {guild.data::%{_guild}%::list::*}:
+		send "&5&l[GUILD] &5%player% : %uncolored {_msg}%" to loop-value parsed as offline player
+	send "[GUILD] %player% : %uncolored {_msg}%" to console
+
+on chat: # 길드 Prefix
+	set {_guild} to getPlayerGuild(player)
+	{_guild} is set
+	set message format to "&5[&r%{_guild}%&5]&r %message format%"
+
+command /길드 [<text>] [<text>]:
+	trigger:
+		if getPlayerGuild(player) is set:
+			runGuildManage(player)
+		else:
+			runGuildList(player, 1)
+
+command /reset-guild:
+	permission: opterater
+	trigger:
+		loop {guild.list::*}:
+			delete {guild.data::%loop-value%::*}
+		delete {guild.list::*}
+		delete {guild.has::*}

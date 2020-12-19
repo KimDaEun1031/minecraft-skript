@@ -1,0 +1,13 @@
+command /helloscoreboards:
+    trigger:
+        set name of sidebar of player to "&6Hello Scoreboards!"
+        set score "My Score:" in sidebar of player to 0
+        wait 10 seconds
+        wipe player's sidebar
+
+
+every 1 seconds:
+	loop all players:
+		wipe loop-player's sidebar
+		set name of sidebar of loop-player to "&6My Server"
+		set score "&a{%loop-player%::value}!" in sidebar of loop-player to 1

@@ -1,0 +1,393 @@
+#! 현재 오류 : 주문서가 안써짐	!#
+
+on rightclick:
+	if name of player's tool contains "강화":
+		execute player command "/강화"
+		
+command /강화:
+	trigger:
+		open chest with 3 rows named "&8&l강화시스템" to player
+		set slot 0 and 1 and 2 and 3 and 4 and 5 and 6 and 7 and 8 and 9 and 11 and 13 and 15 of current inventory of player to gray stained glass pane named " " with lore " "
+		set slot 10 of player's current inventory to anvil named "&2무기 변형 &7| | 이용대금 : 5000 | |" with lore "&e클릭시 무기 변형 창을 엽니다." and "&e일반 무기를 먼저 변형해야만 강화를 할 수 있습니다."
+		set slot 12 of player's current inventory to gold ingot named "&9무기 강화" with lore "&e클릭시 무기 강화 창을 엽니다."		
+		set slot 14 of player's current inventory to diamond named "&c무기 제련" with lore "&e클릭시 무기 제련 창을 엽니다."		
+		set slot 16 of player's current inventory to lapis lazuli named "&a인첸트 강화" with lore "&e클릭시 인첸트 강화 창을 엽니다."
+		set slot 17 and 18 and 19 and 20 and 21 and 22 and 23 and 24 and 25 and 26 and 27 of current inventory of player to gray stained glass pane named " " with lore " "
+		
+#강화 창
+
+on inventory click:
+	if iname contains "강화시스템":
+		if clicked raw slot is 10:
+			cancel event
+			open chest with 3 rows named "&2&l무기 변형" to player
+			set slot 0 and 1  and 2 and 3 and 4 and 5 and 6 and 7 and 8 and 9 and 12 and 14 of current inventory of player to gray stained glass pane named " " with lore " "
+			set slot 11 of player's current inventory to book named "&2도움말" with lore "&e무기를 넣는 곳"
+			set slot 13 of player's current inventory to anvil named "&c무기 변형" with lore "&e왼쪽에 무기를 넣고" and "&e무기 변형 버튼을 누르면" and "&e오른쪽에 변형된 무기가 나옵니다." and "&c&l주의! 이미 변형된 무기를 변형하게 되면" and "&c&l0단계로 초기화 됩니다."
+			set slot 15 of player's current inventory to book named "&2도움말" with lore "&e무기가 나오는 곳"
+			set slot 17 and 18 and 19 and 20 and 21 and 23 and 24 and 25 and 26 and 27 of current inventory of player to gray stained glass pane named " " with lore " "
+			set slot 22 of player's current inventory to red stained glass pane named "&f뒤로가기"
+		
+		if clicked raw slot is 12:
+			cancel event
+			open chest with 5 rows named "&9&l무기 강화" to player
+			loop 45 times:
+				if loop-value - 1 is 1 or 3 or 5 or 7 or 9 or 17 or 27 or 35 or 37 or 39 or 41 or 43:
+					format slot loop-value - 1 of player with gray stained glass pane named " " with lore " " to be unstealable
+				
+				else if loop-value - 1 is 0 or 2 or 4 or 6 or 7 or 8 or 18 or 26 or 36 or 38 or 40 or 42 or 44:
+					format slot loop-value - 1 of player with gray stained glass pane named " " with lore " " to be unstealable
+			
+			set slot 19 of current inventory of player to book named "&2도움말" with lore "&e빈칸에 강화를 하고자 하는 무기를 둡니다."
+			set slot 12 of current inventory of player to book named "&2도움말" with lore "&e아래에 현재 무기보다 1단계 높은 강화석을 둡니다."
+			set slot 13 of current inventory of player to book named "&2도움말" with lore "&e아래에 현재 행운석을 둡니다."
+			set slot 14 of current inventory of player to book named "&2도움말" with lore "&e아래에 파괴 방지 부적을 둡니다."
+			set slot 22 of current inventory of player to anvil named "&4무기 강화" with lore "&e왼쪽 클릭시 일정 확률로 강화에 성공합니다." and "&l실패 시 단계 하락 및 사용 불가될 수 있습니다."		
+			set slot 25 of current inventory of player to book named "&2도움말"
+			set slot 21 and 23 of current inventory of player to lime stained glass pane named " " with lore " "
+			set slot 11 and 10 and 28 and 29 and 15 and 16 and 34 and 33 of current inventory of player to light blue stained glass pane named " " with lore " "
+			exit
+			
+		if clicked raw slot is 14 or 16:
+			cancel event
+			send "&e&l[&f&l강화&e&l] &f: 준비 중입니다."
+	
+	#무기 변형 창
+	if iname contains "무기 변형":
+		if clicked raw slot is not 10 or 13 or 16 or 22:
+			if clicked raw slot <= 27:
+				cancel event
+		else if clicked raw slot is 22:
+			cancel event
+			execute player command "/강화"
+		else if clicked raw slot is 13:
+			cancel event
+			if slot 10 of current inventory of player is air:
+				send "&e&l[&f&l강화&e&l] &f: 무기를 올려주세요."
+				exit
+			if slot 16 of current inventory of player is not air:
+				send "&e&l[&f&l강화&e&l] &f: 무기를 빼주세요."
+				exit
+			else:				
+				if {money} < 5000:
+					send "&e&l[&f&l강화&e&l] &f: 돈이 부족합니다."
+					exit
+				else:
+					subtract 5000 from {money}
+					set {_w} to slot 10 of current inventory of player
+					delete slot 10 of current inventory of player
+					set slot 16 of current inventory of player to {_w} with lore " " and "&b0단계" and "&e==========" and "&a + 체력 0" and "&c + 공격력 0" and "&9 + 방어력 0" and "&e=========="
+					send "&e&l[&f&l강화&e&l] &f: 무기 변형에 성공하셨습니다."
+					play sound "BLOCK_ANVIL_USE" with volume 1 and pitch 1 at player
+					exit
+				
+	#무기 강화 창
+	if iname contains "무기 강화":
+		if clicked raw slot is not 20 or 22 or 24 or 30 or 31 or 32:
+			clicked raw slot <= 44:
+				cancel event
+				exit
+				
+		else if clicked raw slot is 22:
+			cancel event
+			#해당 변수에 slot 20에 있는 아이템의 lore를 색깔 빼고 입력
+			set {_아이템} to slot 20 of current inventory of player
+			set {_장비스탯::*} to uncolored lore of slot 20 of current inventory of player
+			replace all "단계" with "" in {_장비스탯::2}
+			replace all " " and "+" and "체력" with "" in {_장비스탯::4}
+			replace all " " and "+" and "공격력" with "" in {_장비스탯::5}
+			replace all " " and "+" and "방어력" with "" in {_장비스탯::6}
+			set {_강화단계} to {_장비스탯::2} parsed as number
+			set {_강화체력} to {_장비스탯::4} parsed as number
+			set {_강화공격력} to {_장비스탯::5} parsed as number
+			set {_강화방어력} to {_장비스탯::6} parsed as number
+			
+			#강화석 정보를 변수에 대입
+			set {_강화석스탯::*} to uncolored lore of slot 30 of current inventory of player
+			replace all " " and "단계" and "아이템을" and "강화하는데" and "쓰입니다." with "" in {_강화석스탯::1}
+			set {_강화석스탯} to {_강화석스탯::1} parsed as number
+			
+			#강화 확률 증가권 정보를 변수에 대입
+			set {_강화확률증가권스탯::*} to uncolored lore of slot 31 of current inventory of player
+			replace all " " and "강화" and "확률을" and "%%" and "올려줍니다." with "" in {_강화확률증가권스탯::1}
+			set {_강화확률증가권스탯} to {_강화확률증가권스탯::1} parsed as number
+			set {_확률증가권} to slot 31 of current inventory of player 
+			
+			#강화 파괴 방지권 정보를 변수에 대입
+			set {_강화파괴방지권스탯::*} to uncolored lore of slot 32 of current inventory of player
+			#주문서 자체가 있다는데 어디?
+			set {_파괴방지권} to slot 32 of current inventory of player 
+			
+			if {_확률증가권} is not air:
+				if {_강화확률증가권스탯::3} is not "강화확률증가권":
+					send "&e&l[&f&l강화&e&l] &f: 강화 확률 증가권 자리가 아닙니다."
+					exit
+				else:
+					set {_is강화확률증가권} to true
+			else:
+				set {_is강화확률증가권} to false
+					
+			if {_파괴방지권} is not air:
+				if {_강화파괴방지권스탯::2} is not "강화파괴방지권":
+					send "&e&l[&f&l강화&e&l] &f: 강화 파괴 방지권 자리가 아닙니다."
+					exit
+				else:
+					set {_is강화파괴방지권} to true
+			else:
+				set {_is강화파괴방지권} to false
+			
+			
+			if {_강화단계} is not set:
+				send "&e&l[&f&l강화&e&l] &f: 해당 아이템을 강화하려면 변형을 하셔야합니다."
+				exit
+			
+			else if {_강화단계} is not {_강화석스탯}:
+				send "&e&l[&f&l강화&e&l] &f: 강화석은 무기보다 1단계 높은 강화석으로 강화하실 수 있습니다."
+				#message "강화단계 : %{_강화단계}% | | 강화석스탯 : %{_강화석스탯::1}%"
+				exit
+			else if {money} < {_강화단계} * 5000 + 1500 + {_강화단계} * 500:
+				send "&e&l[&f&l강화&e&l] &f: 해당 아이템을 강화하시려면 %{_강화단계} * 5000 + 1500 + {_강화단계} * 500%가 필요합니다."
+				exit
+				
+			else:
+				subtract {_강화단계} * 5000 + 1500 + {_강화단계} * 500 from {money}
+				set {_강화석} to slot 30 of current inventory of player
+				set {_am} to amount of {_강화석} in current inventory of player
+				set {_amount} to {_am} - 1
+				set {_am강화확률증가권} to amount of {_확률증가권} in current inventory of player
+				set {_am강화파괴방지권} to amount of {_파괴방지권} in current inventory of player
+				set {_amount강화확률증가권} to {_am강화확률증가권} - 1
+				set {_amount강화파괴방지권} to {_am강화파괴방지권} - 1
+				
+				delete slot 30 of current inventory of player
+				delete slot 31 of current inventory of player
+				
+				wait 12 tick
+				set slot 30 of current inventory of player to {_amount} of {_강화석}
+				set slot 31 of current inventory of player to {_amount강화확률증가권} of {_확률증가권}
+				
+				set {_강화확률} to (100 - (8.023 + {_강화단계}) * {_강화단계} * 1.2 + {_강화단계} * 2.53 * 1.5)
+				if {%uuid of player%.오피강화보정} is true:
+					set {_강화확률} to 100
+					
+				set {_강화확률} to {_강화확률} + {_강화확률증가권스탯}
+				
+				chance of {_강화확률}%:
+					delete slot 20 of current inventory of player
+					set slot 24 of current inventory of player to {_아이템} with lore " " and "&b%{_강화단계} + 1%단계" and "&e==========" and "&a + 체력 %{_강화체력} + 0.5%" and "&c + 공격력 %{_강화공격력} + 1%" and "&9 + 방어력 %{_강화방어력} + 0.8%" and "&e=========="
+					send "&e&l[&f&l강화&e&l] &f: 강화에 성공하셨습니다."
+					send "&e&l[&f&l강화&e&l] &f: 강화 확률 : [%{_강화확률}%]"
+					send "&e&l[&f&l강화&e&l] &f: 강화에 성공하셨습니다."			
+					exit
+				
+				else:
+					play sound "BLOCK_ANVIL_DESTROY" with volume 1 and pitch 1 at player
+					
+					if {_is강화확률증가권} is false:
+						set {_내려갈확률} to 10
+						
+					chance of 5%:
+						if {_is강화파괴방지권} is true:
+							delete slot 32 of current inventory of player
+							wait 12 tick
+							set slot 32 of current inventory of player to {_amount강화파괴방지권} of {_파괴방지권}
+							send "&e&l[&f&l강화&e&l] &f: 파괴방지권을 사용하여 아이템이 파괴되지 않았습니다."
+							exit
+						else:
+							send "&e&l[&f&l강화&e&l] &f: 해당 아이템은 파괴되었습니다."
+							delete slot 20 of current inventory of player
+							exit
+					else:
+						chance of {_내려갈확률}%:
+							send "&e&l[&f&l강화&e&l] &f: 강화 단계가 내려갔습니다."
+							delete slot 20 of current inventory of player
+							set slot 24 of current inventory of player to {_아이템} with lore " " and "&b%{_강화단계} - 1%단계" and "&e==========" and "&a + 체력 %{_강화체력} - 0.5%" and "&c + 공격력 %{_강화공격력} - 1%" and "&9 + 방어력 %{_강화방어력} - 0.8%" and "&e=========="
+							exit
+						else:
+							send "&e&l[&f&l강화&e&l] &f: 강화에 실패하셨습니다."
+							exit
+					
+on inventory close:
+	if icname contains "무기 변형":
+		set {_무기변형::*} to slot 1 and 7 of current inventory of player
+		wait 1 tick
+		loop {_무기변형::*}:
+			if loop-value is not air:
+				set {_bool} to onInvenFull(player)
+				if {_bool} is true:
+					drop loop-value at player's location
+				else:
+					give loop-value to player
+		exit	
+				
+	else if icname contains "무기 강화":	
+		set {_무기강화::*} to slot 20 and 24 and 30 and 31 and 32 of current inventory of player
+		wait 1 tick
+		loop {_무기강화::*}:
+			if loop-value is not air:
+				set {_bool} to onInvenFull(player)
+				if {_bool} is true:
+					drop loop-value at player's location
+				else:
+					give loop-value to player
+		exit	
+			
+#커맨드
+
+command /강화아이템 [<string>] [<number>] [<number>]:
+	trigger:
+		if arg 1 is "확률":
+			send "&e=========================="
+			loop 8 times:
+				set {_강화단계} to loop-value - 1
+				set {_강화확률} to (100 - (8.023 + {_강화단계}) * {_강화단계} * 1.2 + {_강화단계} * 2.53 * 1.5)
+				send "&e&l[&f&l강화&e&l] &f: %{_강화단계}% -> %{_강화단계}+1% 단계: %{_강화확률}%%%, 강화비용: %{_강화단계} * 5000 + 1500 + {_강화단계} * 500%"
+			send "&e=========================="
+			exit
+		
+		else if arg 1 is "강화석":
+			if player is not op:
+				send "&e&l[&f&l강화&e&l] &f: 관리자 권한이 필요합니다."
+				exit
+			else:
+				give arg 3 of emerald named "&6강화석 &d(%arg 2% 단계)" with lore "&b%arg 2 - 1%단계 아이템을 강화하는데 쓰입니다." to player
+				send "&e&l[&f&l강화&e&l] &f: &b%arg 2%단계&r 강화석을 받았습니다."
+				exit
+			
+		else if arg 1 is "오피":
+			if player is not op:
+				send "&e&l[&f&l강화&e&l] &f: 관리자 권한이 필요합니다."
+				exit
+			else:
+				if {%uuid of player%.오피강화보정} is not set:
+					set {%uuid of player%.오피강화보정} to true
+					send "&e&l[&f&l강화&e&l] &f: [OP전용] 강화 확률을 100%%로 만들었습니다."
+					exit
+				else:
+					delete {%uuid of player%.오피강화보정}
+					send "&e&l[&f&l강화&e&l] &f: [OP전용] 강화 확률 100%% 고정을 취소했습니다."
+					exit
+		
+		else if arg 1 is "확률증가권":
+			give 1 of paper named "&6강화확률증가권" with lore "&b강화 확률을 &c%arg 2%%% &r올려줍니다." and "&r그리고 강화수치가 내려가지 않게 해줍니다." to player
+			send "&e&l[&f&l강화&e&l] &f: &b강화&a확률증가권&r을 받았습니다."
+			exit
+	
+		else if arg 1 is "파괴방지권":
+			give 1 of paper named "&6강화파괴방지권" with lore "&b강화 시 &c아이템 파괴&r를 막아줍니다." to player
+			send "&e&l[&f&l강화&e&l] &f: &b강화&a파괴방지권&r을 받았습니다."
+			exit
+		
+		
+command /test:
+	trigger:
+		message "체력 : %{%player%.스탯.%{스탯::1}%}%"
+		message "공격력 : %{%player%.스탯.%{스탯::2}%}%"
+		message "방어력 : %{%player%.스탯.%{스탯::3}%}%"
+			
+command /돈설정:
+	trigger:
+		set {money} to 0
+		send "&e&l[&4&l가상화폐&e&l] &f: 돈설정을 완료하였습니다."
+
+command /돈정보:
+	trigger:
+		send "&e&l[&4&l가상화폐&e&l] &f: 현재 돈 : %{money}%"
+		
+command /돈주기 [<integer>]:
+	trigger:
+		add arg 1 to {money}
+		send "&e&l[&4&l가상화폐&e&l] &f: 돈이 %arg 1%만큼 추가되었습니다."
+			
+			
+
+#함수 설정
+
+#인벤토리가 꽉 찼는지 확인
+function onInvenFull(p: player) :: boolean:
+	loop all items in the inventory of {_p}:
+		add 1 to {_tmp}
+	if {_p}'s offhand is not air:
+		subtract 1 from {_tmp}
+	if {_p}'s boots is not air:
+		subtract 1 from {_tmp}
+	if {_p}'s leggings is not air:
+		subtract 1 from {_tmp}
+	if {_p}'s chestplate is not air:
+		subtract 1 from {_tmp}
+	if {_p}'s helmet is not air:
+		subtract 1 from {_tmp}
+	if {_tmp} is 36:
+		return true
+	else:
+		return false
+			
+#스탯 설정
+
+every 10 tick:
+	set {스탯::1} to "체력"
+	set {스탯::2} to "공격력"
+	set {스탯::3} to "방어력"
+	
+	loop all players:
+		#각 배열 변수에 플레이어 장비의 로어를 대입
+		set {_%loop-player%.lore.1::*} to uncolored lore of loop-player's helmet
+		set {_%loop-player%.lore.2::*} to uncolored lore of loop-player's chestplate
+		set {_%loop-player%.lore.3::*} to uncolored lore of loop-player's leggings
+		set {_%loop-player%.lore.4::*} to uncolored lore of loop-player's boots
+		set {_%loop-player%.lore.5::*} to uncolored lore of loop-player's offhand
+		set {_%loop-player%.lore.6::*} to uncolored lore of loop-player's tool
+		
+		#각 장비의 갯수 만큼 반복 그리고 체력, 공격력, 방어력 3번 반복해서 숫자만 남긴 데이터를 변수에 대입
+		loop 6 times:
+			loop 3 times:
+				replace all " " and "+" and {스탯::%loop-value-3%} with "" in {_%loop-player%.lore.%loop-value-2%::%loop-value-3 + 3%}
+				set {%loop-player%.스탯.%loop-value-2%.%{스탯::%loop-value-3%}%} to {_%loop-player%.lore.%loop-value-2%::%loop-value-3 + 3%} parsed as number
+	
+		loop 3 times:
+			#플레이어의 체력, 공격력, 방어력 순. 플레이어 스탯을 0으로 초기화
+			set {%loop-player%.스탯.%{스탯::%loop-value-2%}%} to 0
+			
+			#6번 반복해서 6개의 장비 스탯을 플레이어 스탯에 더함
+			loop 6 times:
+				add {_%loop-player%.스탯.%loop-value-3%.%{스탯::%loop-value-2%}%} to {%loop-player%.스탯.%{스탯::%loop-value-2%}%}
+				
+		set loop-player's max health to {%loop-player%.스탯.%{스탯::1}%}/4 + 10
+	
+on damage:
+	if attacker is player:
+		if {str.%attacker%} is set:
+			set damage to damage + {%attacker%.스탯.%{스탯::2}%}/5
+			set {test.%attacker%.준데미지} to damage
+			#message : "데미지 : %damage%" to attacker
+			
+	if victim is player:
+		if {def.%victim%} is set:
+			set damage to damage - {%victim%.스탯.%{스탯::3}%}/6
+			set {test.%victim%.받은데미지} to damage
+			#message : "받은 데미지 : %damage%" to victim
+	
+on join:
+	if {test.%player%.준데미지} is not set:
+		set {test.%player%.준데미지} to 0
+	if {test.%player%.받은데미지} is not set:
+		set {test.%player%.받은데미지} to 0
+	if {강화.%player%} is not set:
+		add 1 to {강화.%player%}
+		give 1 of clock named "강화" to player
+	else:
+		send "&e&l[&f&l강화&e&l] &f: 당신은 이미 아이템을 받으셨습니다."
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+			
+		

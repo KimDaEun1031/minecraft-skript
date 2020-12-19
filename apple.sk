@@ -1,0 +1,11 @@
+command /큼: 
+	trigger:
+		open chest with 1 rows named "아이템을 클릭하면 작동한다!" to player
+		set slot 4 of player's current inventory to apple named "&a사&c과&f를 하나 줍니다." with lore "&f클릭하면 사과를 준다곳??!?!!"
+
+on inventory click: 
+	if iname contains "아이템을 클릭하면 작동한다!":
+		if clicked raw slot is 4:
+			cancel event
+			give 1 apple named "&a맛있어보이는 &c사과" with lore "&f사과 맛있겠지? 더받고싶다고? 언제든지!" to player
+			message "%player%, 다음에도 맛있는 사과를 받으러 오라구!"

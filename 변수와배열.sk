@@ -1,0 +1,37 @@
+command /var:
+	trigger:
+		message "현재 변수는 %{포인트}% 입니다."
+		
+command /varplus:
+	trigger:
+		add 1 to {포인트}
+		message "변수에 1이 추가되었습니다."
+		
+command /varminus:
+	trigger:
+		subtract 1 from {포인트}
+		message "변수에 1이 차감되었습니다."
+		
+command /varget [<integer>]:
+	trigger:
+		add arg 1 to {포인트} #add arg 숫자 to {변수명} : [<integer>]를 늘리면 숫자를 2,3,4... 지정해서 할 수있다.#
+		message "변수에 %arg 1% 만큼 추가되었습니다."
+		
+command /varsubtract [<integer>]:
+	trigger:
+		subtract arg 1 from {포인트} 
+		message "변수에 %arg 1% 만큼 차감되었습니다."
+		
+command /varclear:
+	trigger:
+		set {포인트} to 0
+		message "변수를 초기화시켰습니다."
+
+#배열은 {변수이름::숫자 아니면 *}으로 선언 할 수 있다.
+#자바스크립트와 같이 * 는 전체를 뜻하는듯?
+#숫자로는 {변수이름::1} 라던지 {변수이름::2} 이런식으로 설정 가능
+#배열은 set,add,remove,delete(초기화) 가 있다.
+
+
+
+

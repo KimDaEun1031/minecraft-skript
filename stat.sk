@@ -1,0 +1,4 @@
+command /메뉴:
+	trigger:
+		open chest with 5 rows named "rpgmenu" to player
+		format slot 10 of player with diamond sword named "스폰으로 이동" with lore "클릭하면" and "스폰으로 이동" to close then run [execute op command "/spawn"]
