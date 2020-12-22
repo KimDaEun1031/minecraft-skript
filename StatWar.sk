@@ -1,0 +1,84 @@
+#!======================================!#
+#!                                      !#
+#!                                      !#
+#!                Stat War              !#
+#!                                      !#
+#!                                      !#
+#!======================================!#
+# 제작 : Albino1031
+# 본 스크립트는 다운로드, 2차 수정, 2차 배포, 공유 등등 금지입니다.
+# 본 스크립트는 페이퍼 1.12.2 서버에서 제작되었습니다.
+# 필수 플러그인과 애드온
+# invSK, MarSK, SkChoke, Skellett-Legacy, SkQuery, skRayFall, skUtilities, LuckPerms-Bukkit
+# ver 1.0
+
+options:
+	s1: &f[&4StatWar&f] ::&f&r
+
+#게임 시작시로 다시 들어갈거임
+on join:
+	set {spell.%uuid of player%} to 20
+	set {spells.%uuid of player%} to 20
+	set {stat} to 0
+	{actionbar::%player%} is not set
+	set {actionbar::%player%} to true
+	while player is online:
+		send action bar "&f| | [&3마력&f] &c%{spell.%uuid of player%}%:%{spells.%uuid of player%}% | |" to player
+		wait 2 seconds
+	delete {actionbar::%player%}
+
+#!======================================!#
+#!                                      !#
+#!                  메뉴                  !#
+#!          스탯 | 상점 | 스킬 | 인첸트        !#
+#!======================================!#
+
+on rightclick:
+	if name of player's tool contains "Menu":
+		open chest with 3 rows named "Menu" to player
+		set slot 0 and 1 and 2 and 3 and 4 and 5 and 6 and 7 and 8 of current inventory of player to gray stained glass pane named " " with lore " "
+		set slot 18 and 19 and 20 and 21 and 22 and 23 and 24 and 25 and 26 of current inventory of player to gray stained glass pane named " " with lore " "
+		set slot 10 of current inventory of player to book named "스탯"
+		set slot 12 of current inventory of player to book named "상점"
+		set slot 14 of current inventory of player to book named "스킬"
+		set slot 16 of current inventory of player to book named "인챈트"
+		set slot 9 and 11 and 13 and 15 and 17 of current inventory of player to gray stained glass pane named " " with lore " "
+		
+#!======================================!#
+#!                                      !#
+#!                메뉴 창                 !#
+#!          스탯 | 상점 | 스킬 | 인첸트        !#
+#!======================================!#
+
+
+
+
+
+
+
+		
+#!======================================!#
+#!                                      !#
+#!                커맨드                  !#
+#!          					        !#
+#!======================================!#
+
+#게임 시작시
+command /sw [<string>]:
+	trigger:
+		if arg 1 is "start":
+			
+			
+
+
+
+
+
+
+
+
+
+
+
+
+

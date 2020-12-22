@@ -325,47 +325,47 @@ function onInvenFull(p: player) :: boolean:
 #스탯 설정
 
 every 10 tick:
-	set {스탯::1} to "체력"
-	set {스탯::2} to "공격력"
-	set {스탯::3} to "방어력"
-	
-	loop all players:
-		#각 배열 변수에 플레이어 장비의 로어를 대입
-		set {_%loop-player%.lore.1::*} to uncolored lore of loop-player's helmet
-		set {_%loop-player%.lore.2::*} to uncolored lore of loop-player's chestplate
-		set {_%loop-player%.lore.3::*} to uncolored lore of loop-player's leggings
-		set {_%loop-player%.lore.4::*} to uncolored lore of loop-player's boots
-		set {_%loop-player%.lore.5::*} to uncolored lore of loop-player's offhand
-		set {_%loop-player%.lore.6::*} to uncolored lore of loop-player's tool
-		
-		#각 장비의 갯수 만큼 반복 그리고 체력, 공격력, 방어력 3번 반복해서 숫자만 남긴 데이터를 변수에 대입
-		loop 6 times:
-			loop 3 times:
-				replace all " " and "+" and {스탯::%loop-value-3%} with "" in {_%loop-player%.lore.%loop-value-2%::%loop-value-3 + 3%}
-				set {%loop-player%.스탯.%loop-value-2%.%{스탯::%loop-value-3%}%} to {_%loop-player%.lore.%loop-value-2%::%loop-value-3 + 3%} parsed as number
-	
-		loop 3 times:
-			#플레이어의 체력, 공격력, 방어력 순. 플레이어 스탯을 0으로 초기화
-			set {%loop-player%.스탯.%{스탯::%loop-value-2%}%} to 0
-			
-			#6번 반복해서 6개의 장비 스탯을 플레이어 스탯에 더함
-			loop 6 times:
-				add {_%loop-player%.스탯.%loop-value-3%.%{스탯::%loop-value-2%}%} to {%loop-player%.스탯.%{스탯::%loop-value-2%}%}
-				
-		set loop-player's max health to {%loop-player%.스탯.%{스탯::1}%}/4 + 10
-	
+    set {스탯::1} to "체력"
+    set {스탯::2} to "공격력"
+    set {스탯::3} to "방어력"
+
+    loop all players:
+        # 각 배열 변수에 player 장비의 lore을 대입
+        set {_%loop-player%.lore.1::*} to uncolored lore of loop-player's helmet
+        set {_%loop-player%.lore.2::*} to uncolored lore of loop-player's chestplate
+        set {_%loop-player%.lore.3::*} to uncolored lore of loop-player's Leggings
+        set {_%loop-player%.lore.4::*} to uncolored lore of loop-player's boots
+        set {_%loop-player%.lore.5::*} to uncolored lore of loop-player's offhand
+        set {_%loop-player%.lore.6::*} to uncolored lore of loop-player's tool
+
+        # 각 장비의 갯수 만큼 반복, 그리고 체력, 공격력, 방어력 3번 반복해서 숫자만 남긴 데이터를 변수에 대입
+        loop 6 times:
+            loop 3 times:
+                replace all " " and "+" and {스탯::%loop-value-3%} with "" in {_%loop-player%.lore.%loop-value-2%::%loop-value-3 + 3%}
+                set {_%loop-player%.스탯.%loop-value-2%.%{스탯::%loop-value-3%}%} to {_%loop-player%.lore.%loop-value-2%::%loop-value-3 + 3%} parsed as number
+
+        loop 3 times:
+            # 플레이어의 체력, 공격력, 방어력 순으로 반복함. 그리고 플레이어의 스탯을 0으로 초기화
+            set {%loop-player%.스탯.%{스탯::%loop-value-2%}%} to 0 
+
+            # 6번 반복해서 6개의 장비 스탯을 플레이어의 스탯에 더함.
+            loop 6 times:
+                add {_%loop-player%.스탯.%loop-value-3%.%{스탯::%loop-value-2%}%} to {%loop-player%.스탯.%{스탯::%loop-value-2%}%}
+
+        set loop-player's max health to {%loop-player%.스탯.%{스탯::1}%}/4 + 10
+
 on damage:
-	if attacker is player:
-		if {str.%attacker%} is set:
-			set damage to damage + {%attacker%.스탯.%{스탯::2}%}/5
-			set {test.%attacker%.준데미지} to damage
-			#message : "데미지 : %damage%" to attacker
-			
-	if victim is player:
-		if {def.%victim%} is set:
-			set damage to damage - {%victim%.스탯.%{스탯::3}%}/6
-			set {test.%victim%.받은데미지} to damage
-			#message : "받은 데미지 : %damage%" to victim
+    if attacker is player:
+        if {str.%attacker%} is set:
+            set damage to damage + {%attacker%.스탯.%{스탯::2}%}/5
+            set {test.%attacker%.준데미지} to damage
+            #message "데미지: %damage%" to attacker
+
+    if victim is player:
+        if {def.%victim%} is set:
+            set damage to damage - {%victim%.스탯.%{스탯::3}%}/6
+            set {test.%victim%.받은데미지} to damage
+            #message "받은 데미지: %damage%" to victim
 	
 on join:
 	if {test.%player%.준데미지} is not set:

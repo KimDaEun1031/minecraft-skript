@@ -37,17 +37,25 @@ function getPlayerGuild(p:player) :: text: # 길드 이름 가져오기
 	set {_pu} to uuid of {_p}
 	set {_r} to {guild.has::%{_pu}%}
 	return {_r}
+	
+	
 function getGuildPoint(p:player) :: number: # 길드 포인트 가져오기
 	set {_guild} to getPlayerGuild({_p})
 	set {_r} to 0
 	set {_r} to {guild.data::%{_guild}%::point}
 	return {_r}
+	
+	
 function getGuildLevel(p:player) :: number: # 길드 레벨 가져오기
 	set {_guild} to getPlayerGuild({_p})
 	return {guild.data::%{_guild}%::level}
+	
+	
 function getGuildLeader(p:player) :: text: # 길드 리더 가져오기
 	set {_guild} to getPlayerGuild({_p})
 	return {guild.data::%{_guild}%::leader}
+	
+	
 function isGuildLeader(p:player) :: boolean:
 	set {_guild} to getPlayerGuild({_p})
 	set {_pu} to uuid of {_p}
@@ -55,6 +63,8 @@ function isGuildLeader(p:player) :: boolean:
 		return true
 	else:
 		return false
+		
+		
 function isGuildExist(guild:text) :: boolean: # 길드 존재 여부
 	set {_r} to false
 	loop {guild.list::*}:
@@ -62,6 +72,8 @@ function isGuildExist(guild:text) :: boolean: # 길드 존재 여부
 		set {_r} to true
 		exit loop
 	return {_r}
+	
+	
 function addGuildPoint(p:player,point:number): # 길드 포인트 추가
 	set {_pu} to uuid of {_p}
 	set {_guild} to getPlayerGuild({_p})
@@ -70,6 +82,8 @@ function addGuildPoint(p:player,point:number): # 길드 포인트 추가
 
 	add {_point} to {guild.data::%{_guild}%::point::%{_pu}%}
 	add {_point} to {guild.data::%{_guild}%::point}
+	
+	
 function subGuildPoint(p:player,point:number): # 길드 포인트 차감
 	set {_guild} to getPlayerGuild({_p})
 
@@ -78,6 +92,8 @@ function subGuildPoint(p:player,point:number): # 길드 포인트 차감
 	subtract {_point} from {guild.data::%{_guild}%::point}
 	{guild.data::%{_guild}%::point} < 0
 	set {guild.data::%{_guild}%::point} to 0
+	
+	
 function setGuildPoint(p:player,point:number): # 길드 포인트 설정
 	set {_guild} to getPlayerGuild({_p})
 

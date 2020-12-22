@@ -1,0 +1,56 @@
+command /potion:
+	trigger:
+		apply health boost 1 without any particles to player for 15 seconds replacing the existing effect
+		
+command /maxhp [<integer>]:
+	trigger:
+		set the maximum health of the player to arg 1
+		
+command /maxhpadd [<integer>]:
+	trigger:
+		add arg 1 to maximum health of the player
+		
+command /set:
+	trigger:
+		delete {party.on::*}
+		delete {party.out::*}
+		set {count} to 1
+		set {count2} to 1 
+		
+
+command /in:
+	trigger:		
+		set {party.on::%{count}%} to player
+		message "[%{count}%] %player%님이 게임에 참가하셨습니다."
+		add 1 to {count}
+		
+command /add [<string>]:
+	trigger:
+		set {party.on::%{count}%} to arg 1
+		add 1 to {count}
+		message "플레이어 추가 완료"
+		
+command /ch1:
+	trigger:
+		loop {party.on::*}:
+			message "[%loop-index%] %loop-value%"
+command /ch2:
+	trigger:
+		loop {party.out::*}:
+			message "[%loop-index%] %loop-value%"
+			
+command /out:
+	trigger:
+		if {party.on::*} is set:
+			remove player from {party.on::*}
+			subtract 1 from {count}
+			set {party.out::%{count2}%} to player
+			message "플레이어가 게임에 비참가하셨습니다."
+		
+			
+
+			
+ 
+			
+			
+			
