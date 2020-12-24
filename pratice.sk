@@ -17,7 +17,6 @@ command /set:
 		set {count} to 1
 		set {count2} to 1 
 		
-
 command /in:
 	trigger:		
 		set {party.on::%{count}%} to player
@@ -46,6 +45,23 @@ command /out:
 			subtract 1 from {count}
 			set {party.out::%{count2}%} to player
 			message "플레이어가 게임에 비참가하셨습니다."
+			
+command /check:
+	trigger:
+		set {joblv::*} to 0
+		set {mine} to 0
+		set {farm} to 0
+		set {log} to 0
+		set {smelt} to 0
+		set {breed} to 0
+		set {cook} to 0
+		message "%{joblv::mine}%"
+		message "%{joblv::farm}%"
+		message "%{joblv::log}%"
+		message "%{joblv::smelt}%"
+		message "%{joblv::breed}%"
+		message "%{joblv::cook}%"
+		
 		
 			
 

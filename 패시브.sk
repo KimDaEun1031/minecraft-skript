@@ -35,8 +35,8 @@ command /경험치최대설정:
 			set {_n} to loop-value
 			set {_add} to {_n} * 32
 			set {_exp} to {_n} * 128 + {_add}
-			set {max} to {_exp}
-			message "%{_n}% - %{max}%"
+			set {max::%{_n}%} to {_exp}
+			message "%{_n}% - %{max::%{_n}%}%"
 		set {max::21} to "MAX" 
 		set {maxlv} to 21
 		exit

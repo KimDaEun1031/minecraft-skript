@@ -5,8 +5,8 @@
 #!                                      !#
 #!                                      !#
 #!======================================!#
-# 제작 : Albino1031
-# 본 스크립트는 다운로드, 2차 수정, 2차 배포, 공유 등등 금지입니다.
+# 제작 : 비노(Albino1031)
+# 본 스크립트는 비노(Albino1031)의 저작물이며 저작권은 비노(Albino1031)에게 있습니다.
 # 본 스크립트는 페이퍼 1.12.2 서버에서 제작되었습니다.
 # 필수 플러그인과 애드온
 # invSK, MarSK, SkChoke, Skellett-Legacy, SkQuery, skRayFall, skUtilities, LuckPerms-Bukkit
@@ -15,42 +15,103 @@
 options:
 	s1: &f[&4StatWar&f] ::&f&r
 
-#게임 시작시로 다시 들어갈거임
+#!======================================!#
+#!                                      !#
+#!				게임 접속 시				!#
+#!										!#
+#!======================================!#
+
 on join:
-	set {spell.%uuid of player%} to 20
-	set {spells.%uuid of player%} to 20
-	set {stat} to 0
-	{actionbar::%player%} is not set
-	set {actionbar::%player%} to true
-	while player is online:
-		send action bar "&f| | [&3마력&f] &c%{spell.%uuid of player%}%:%{spells.%uuid of player%}% | |" to player
-		wait 2 seconds
-	delete {actionbar::%player%}
+	if {joingame.%player%} is not set:
+		set {joingame.%player%} to 1
+		execute player command "/setting"
+	else:
+		message "{@s1} 이미 게임 설정이 완료되었습니다." to player
+		message "{@s1} 게임 설정을 초기화 하시려면 /sw setting을 쳐주세요." to player
 
 #!======================================!#
 #!                                      !#
-#!                  메뉴                  !#
-#!          스탯 | 상점 | 스킬 | 인첸트        !#
+#!                  메뉴					!#
+#!          스탯 | 상점 | 스킬 | 인첸트		!#
 #!======================================!#
 
 on rightclick:
 	if name of player's tool contains "Menu":
-		open chest with 3 rows named "Menu" to player
-		set slot 0 and 1 and 2 and 3 and 4 and 5 and 6 and 7 and 8 of current inventory of player to gray stained glass pane named " " with lore " "
-		set slot 18 and 19 and 20 and 21 and 22 and 23 and 24 and 25 and 26 of current inventory of player to gray stained glass pane named " " with lore " "
-		set slot 10 of current inventory of player to book named "스탯"
-		set slot 12 of current inventory of player to book named "상점"
-		set slot 14 of current inventory of player to book named "스킬"
-		set slot 16 of current inventory of player to book named "인챈트"
-		set slot 9 and 11 and 13 and 15 and 17 of current inventory of player to gray stained glass pane named " " with lore " "
+		execute player command "/Menu"
 		
 #!======================================!#
 #!                                      !#
-#!                메뉴 창                 !#
-#!          스탯 | 상점 | 스킬 | 인첸트        !#
+#!                메뉴 창					!#
+#!          스탯 | 상점 | 스킬 | 인첸트		!#
 #!======================================!#
 
-
+on inventory click:
+	if iname contains "Menu":
+		if clicked raw slot is 10:
+			cancel event
+			open chest with 3 rows named "스탯창" to player
+			set slot 0 and 1 and 2 and 3 and 4 and 5 and 6 and 7 and 8 of current inventory of player to gray stained glass pane named " " with lore " "
+			set slot 18 and 19 and 20 and 21 and 23 and 24 and 25 and 26 of current inventory of player to gray stained glass pane named " " with lore " "
+			set slot 10 of current inventory of player to diamond sword named "STR" with lore "힘과 성급함을 증가시킵니다."
+			set slot 12 of current inventory of player to shield named "DEF" with lore "저항과 화염저항을 증가시킵니다."
+			set slot 14 of current inventory of player to sapling named "BLS" with lore "신속과 야간투시, 체력을 증가시킵니다."
+			set slot 16 of current inventory of player to nether star named "LUK" with lore "운, 수중호흡, 느린낙하," and "점프강화, 마력을 증가시킵니다."
+			set slot 22 of current inventory of player to red stained glass pane named "뒤로가기"
+			set slot 9 and 11 and 13 and 15 and 17 of current inventory of player to gray stained glass pane named " " with lore " "
+	
+		if clicked raw slot is 12 and 14 and 16:
+			cancel event
+			message "{@s1} 아직 준비되지 않았습니다."
+	
+	if iname contains "스탯":
+		if click raw slot is not 10 or 12 or 14 or 16 or 22:
+			if clicked raw slot <= 27:
+				cancel event
+		else if clicked raw slot is 22:
+			cancel event
+			execute player command "/Menu"
+		else if clicked raw slot is 10:
+			cancel event
+			set {_str} to 0
+			if {stat.%player%} > 0:
+				add 1 to {str.%player%}
+				wait 1 ticks
+				subtract 1 from {stat.%player%}
+				wait 1 ticks
+				message "STR 스탯이 [%{str.%player%}%] 되었습니다."				
+			else:
+				message "{@s1} 스탯이 부족합니다."
+			if {str.%player%} == 5:
+				apply strength 2 without any particles to player for 10 hours replacing the existing effect
+				add 2 to maximum health of the player
+					
+			if {str.%player%} == 10:
+				apply strength 4 without any particles to player for 10 hours replacing the existing effect
+				add 2 to maximum health of the player
+					
+			if {str.%player%} == 15:
+				apply strength 6 without any particles to player for 10 hours replacing the existing effect
+				apply haste 1 without any particles to player for 10 hours replacing the existing effect
+				add 4 to maximum health of the player
+					
+			if {str.%player%} == 20:
+				apply strength 8 without any particles to player for 10 hours replacing the existing effect
+				apply haste 2 without any particles to player for 10 hours replacing the existing effect
+				add 4 to maximum health of the player
+				
+			if {str.%player%} == 25:
+				apply strength 10 without any particles to player for 10 hours replacing the existing effect
+				apply haste 3 without any particles to player for 10 hours replacing the existing effect
+				add 4 to maximum health of the player
+	
+			if {str.%player%} == 30:
+				add 4 to maximum health of the player
+					
+#!======================================!#
+#!                                      !#
+#!                직업 레벨				!#
+#!          							!#
+#!======================================!#
 
 
 
@@ -59,17 +120,275 @@ on rightclick:
 		
 #!======================================!#
 #!                                      !#
-#!                커맨드                  !#
+#!                커맨드					!#
 #!          					        !#
 #!======================================!#
 
 #게임 시작시
-command /sw [<string>]:
+command /sw [<string>] [<integer>]:
 	trigger:
-		if arg 1 is "start":
+		if arg 1 is "help":
+			if arg 2 is 1:
+				loop 5 times:
+					broadcast ""
+				message "{@s1} /sw help [숫자] : 도움말 [숫자]"
+				message "{@s1} /sw list : 게임에 참가하는 플레이어 목록"
+				message "{@s1} /sw start : 게임을 시작합니다"
+				message "{@s1} /sw stop : 게임을 종료합니다."
+			else if arg 2 is 2:
+				loop 5 times:
+					broadcast ""
+				message "{@s1} /sw entry : 게임에 참가합니다."
+				message "{@s1} /sw stat : 게임 참가시 스탯창을 엽니다."
+				message "{@s1} /sw statLv : 각 스텟의 레벨을 확인합니다."
+				message "{@s1} /sw jobLv : 각 직업의 레벨을 확인합니다."
+			else if arg 2 is 3:
+				loop 5 times:
+					broadcast ""
+				message "{@s1} /sw  : 게임에 참가합니다."
+				message "{@s1} /sw stat : 게임 참가시 스탯창을 엽니다."
+				message "{@s1} /sw statLv : 각 스텟의 레벨을 확인합니다."
+				message "{@s1} /sw jobLv : 각 직업의 레벨을 확인합니다."
+		#help end
+		else if arg 1 is "setting":
+			if player is not op:
+				message "{@s1} 관리자 권한이 필요합니다." to player
+			else:
+				set {stat.%player%} to 0
+				set {str.%player%} to 0
+				set {def.%player%} to 0
+				set {bls.%player%} to 0
+				set {luk.%player%} to 0
+				set {spell.%player%} to 20
+				set {spells.%player%} to 20
+				#mine exp / lv
+				set {job.%player%.mexp} to 0
+				set {mine.%player%} to 1
+				#farm exp / lv
+				set {job.%player%.fexp} to 0
+				set {farm.%player%} to 1
+				#fish exp / lv
+				set {job.%player%.fiexp} to 0
+				set {fish.%player%} to 1
+				#log exp / lv
+				set {job.%player%.lexp} to 0
+				set {log.%player%} to 1
+				#smelt exp / lv
+				set {job.%player%.sexp} to 0
+				set {smelt.%player%} to 1
+				#breed exp / lv
+				set {job.%player%.bexp} to 0
+				set {breed.%player%} to 1
+				#cook exp / lv
+				set {job.%player%.cexp} to 0
+				set {cook.%player%} to 1			
+				delete {swPlay.on::*}
+				if {count} >= 1:
+					add 1 to {count}
+				else:
+					set {count} to 1
+				set {sw.%player%} to false
+				make the player execute command "/gamerule sendCommandFeedback false"
+				message "{@s1} 게임 설정이 완료되었습니다." to player
+		#setting end
+		else if arg 1 is "list":
+			loop {swPlay.on::*}:
+				message "==============================="
+				message " &2 현재 게임에 참가한 플레이어 목록   "
+				message "==============================="
+				message "  &6%loop-value%  "
+				wait 1 ticks
+		#list end
+		else if arg 1 is "entry":
+			loop 5 times:
+				broadcast ""
+			set {swPlay.on::%{count}%} to player
+			message "%player%님이 게임에 참가하셨습니다."
+			add 1 to {count} #현주가 들어왔을 때 내가 어디로 갔는지 알아야댐
+		#entry end
+		else if arg 1 is "start":
+			if player is not op:
+				message "{@s1} 관리자 권한이 필요합니다." to player
+			else if {sw.%player%} is false:
+				loop {swPlay.on::*}:
+					loop 5 times:
+						broadcast ""
+					message "=================="
+					message " &2 플레이어 목록   "
+					message "=================="
+					message "&6%loop-value%"
+					wait 1 ticks
+					broadcast ""
+					message "{@s1} 게임을 시작합니다." to player
+					set {_timecount} to 5
+					wait 1 ticks
+					loop 5 times:
+						message "%{_timecount}%초 뒤에 시작됩니다."
+						subtract 1 from {_timecount}
+						wait 1 seconds
+					wait 1 ticks
+					make the player execute command "/clear"
+					wait 1 ticks
+					kill all players
+					wait 1 ticks
+					loop 130 times:
+						broadcast ""			
+					wait 1 ticks
+					set {sw.%player%} to true
+					execute player command "/actionbar"
+					give 1 of clock named "Menu" to player
+			else:
+				message "{@s1} 이미 게임이 시작되었습니다."
+		#start end		
+		else if arg 1 is "stop":
+			if player is not op:
+				message "{@s1} 관리자 권한이 필요합니다." to player
+			else if {sw.%player%} is true:
+				loop all players:
+					loop 5 times:
+						broadcast ""
+					delete {swPlay.on::*}
+					set {sw.%player%} to 0
+					set {stat.%player%} to 0
+					set {str.%player%} to 0
+					set {def.%player%} to 0
+					set {bls.%player%} to 0
+					set {luk.%player%} to 0
+					set {actionbar::%player%} to false
+					remove strength from the loop-player
+					remove haste from the loop-player
+					remove speed from the loop-player
+					remove jump from the loop-player
+					remove regeneration from the loop-player
+					remove resistance from the loop-player
+					remove fire resistance from the loop-player
+					remove water breathing from the loop-player
+					remove night vision from the loop-player
+					remove health boost from the loop-player
+					remove absorption from the loop-player
+					remove luck from the loop-player					
+					message "{@s1} 게임을 종료합니다." to loop-player
+				set {sw.%player%} to false
+				stop
+			else:
+				message "{@s1} 게임을 시작하지 않았습니다." to player
+		#stop end		
+		else if arg 1 is "jobLv":
+			#if {sw.%player%} is true:
+			message "| | 직업 레벨 | |"
+			message "| | 광질 레벨 [%{mine.%player%}%] | | [%{job.%player%.mexp}%/%{job.maxExp::%{mine.%player%}%}%]"
+			message "| | 농사 레벨 [%{farm.%player%}%] | | [%{job.%player%.fexp}%/%{job.maxExp::%{farm.%player%}%}%]"
 			
-			
+		else if arg 1 is "givest":
+			if {sw.%player%} is true:
+				add arg 2 to {stat.%player%}
+		#givest end
+		else if arg 1 is "expReset":
+			loop 5 times:
+				set {_no} to loop-value
+				set {_add} to {_no} * 80
+				set {_exp} to {_no} * 128 + {_add}
+				set {job.maxExp::%{_no}%} to {_exp}
+				message "[%{_no}%] %{job.maxExp::%{_no}%}%" to player
+			message "{@s1} 직업 경험치가 리셋되었습니다." to player
+			set {job.maxExp::6} to "MAX"
+			set {job.maxExpLv} to 6
+			stop
+		#expReset end
+		
 
+command /Menu:
+	trigger:
+		if {sw.%player%} is true:
+			open chest with 3 rows named "Menu" to player
+			set slot 0 and 1 and 2 and 3 and 4 and 5 and 6 and 7 and 8 of current inventory of player to gray stained glass pane named " " with lore " "
+			set slot 18 and 19 and 20 and 21 and 22 and 23 and 24 and 25 and 26 of current inventory of player to gray stained glass pane named " " with lore " "
+			set slot 10 of current inventory of player to book named "스탯"
+			set slot 12 of current inventory of player to book named "상점"
+			set slot 14 of current inventory of player to book named "스킬"
+			set slot 16 of current inventory of player to book named "인챈트"
+			set slot 9 and 11 and 13 and 15 and 17 of current inventory of player to gray stained glass pane named " " with lore " "
+#menu end
+
+command /actionbar:
+	trigger:
+		{actionbar::%player%} is not set
+		set {actionbar::%player%} to true	
+		while {actionbar::%player%} is true:
+			send action bar "[마력] | | [총 마력] : [%{spell.%player%}%] | | [%{spells.%player%}%]" to player
+			wait 2 seconds
+#actionbar end
+
+command /givem [<integer>]:
+	trigger:
+		add arg 1 to {job.%player%.mexp}
+		
+command /givef [<integer>]:
+	trigger:
+		add arg 1 to {job.%player%.fexp}
+			
+every 1 seconds:
+	loop all players:
+		set {_p} to loop-player
+		if {job.%loop-player%.mexp} = {job.maxExp::%{mine.%loop-player%}%}:
+			if {mine.%loop-player%} < {job.maxExpLv}:
+				add 1 to {mine.%loop-player%}
+				set {job.%loop-player%.mexp} to 0
+				add 3 to {stat.%loop-player%}
+				message "-------------------------------------------" to {_p}
+				message "{@s1} 광질 레벨이 1 올랐습니다!" to {_p}
+				message "-------------------------------------------" to {_p}
+				
+				exit
+		else if {job.%loop-player%.mexp} > {job.maxExp::%{mine.%loop-player%}%}:
+			set {_exp} to {job.%loop-player%.mexp} - {job.maxExp::%{mine.%loop-player%}%}
+			if {mine.%loop-player%} < {job.maxExpLv}:
+				add 1 to {mine.%loop-player%}
+				set {job.%loop-player%.mexp} to 0
+				add {_exp} to {job.%loop-player%.mexp}
+				add 3 to {stat.%loop-player%}
+				message "-------------------------------------------" to {_p}
+				message "{@s1} 광질 레벨이 1 올랐습니다!" to {_p}
+				message "-------------------------------------------" to {_p}				
+				exit
+		else if {job.%loop-player%.mexp} == {job.maxExpLv}:
+			set {job.%loop-player%.mexp} to {job.maxExp::6}
+			if {mine.%loop-player%} is not "MAX LV":
+				message "-------------------------------------------" to {_p}
+				message "{@s1} 축하합니다. 광질 MAX 레벨을 달성하셨습니다!!" to {_p}
+				message "-------------------------------------------" to {_p}
+				set {mine.%loop-player%} to "MAX LV"
+				set {job.%loop-player%.mexp} to "MAX LV"
+				exit
+		#mine lv end
+		else if {job.%loop-player%.fexp} = {job.maxExp::%{farm.%loop-player%}%}:
+			if {farm.%loop-player%} < {job.maxExpLv}:
+				add 1 to {farm.%loop-player%}
+				set {job.%loop-player%.fexp} to 0
+				message "-------------------------------------------" to {_p}
+				message "{@s1} 농사 레벨이 1 올랐습니다!" to {_p}
+				message "-------------------------------------------" to {_p}
+				add 3 to {stat.%loop-player%}
+				exit
+		else if {job.%loop-player%.fexp} > {job.maxExp::%{farm.%loop-player%}%}:
+			set {_exp} to {job.%loop-player%.fexp} - {job.maxExp::%{farm.%loop-player%}%}
+			if {farm.%loop-player%} < {job.maxExpLv}:
+				add 1 to {farm.%loop-player%}
+				set {job.%loop-player%.fexp} to 0
+				add {_exp} to {job.%loop-player%.fexp}
+				message "-------------------------------------------" to {_p}
+				message "{@s1} 농사 레벨이 1 올랐습니다!" to {_p}
+				message "-------------------------------------------" to {_p}
+				add 3 to {stat.%loop-player%}
+				exit
+		else if {job.%loop-player%.fexp} == {job.maxExpLv}:
+			set {job.%loop-player%.fexp} to {job.maxExp::6}
+			if {farm.%loop-player%} is not "MAX LV":
+				message "-------------------------------------------" to {_p}
+				message "{@s1} 축하합니다. 농사 MAX 레벨을 달성하셨습니다!!" to {_p}
+				message "-------------------------------------------" to {_p}
+				set {farm.%loop-player%} to "MAX LV"
+				exit	
 
 
 
