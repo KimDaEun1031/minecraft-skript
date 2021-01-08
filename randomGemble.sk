@@ -1,0 +1,14 @@
+if {gameStart} is true:
+			message "{@s1} 랜덤 도박을 시작합니다."
+			set {_random} to random integer between 0 and 8
+			if {_random} is 0 or 1 or 2 or 3 or 4 or 5 or 6 or 7 or 8:
+				if slot {_random} of player is air:
+					message "{@s1} 선택된 아이템 창이 비어있어 패널티 점수와 패널티를 부과합니다." to player
+					set {_randomTwo} to random integer between 0 and 35
+					if {_randomTwo} is between 0 and 35:
+						message "{@s1} %{_randomTwo}%칸이 초기화되었습니다." to player
+						clear slot {_randomTwo} of player			
+				else if slot {_random} of player is not air:
+					message "{@s1} %{_random}%칸에 랜덤 아이템이 주어집니다!" to player
+else:
+  set {gameStart} to false
